@@ -25,4 +25,4 @@ grep -q 'Auto_Position: 1' <<<"$status"
   echo '从库 SHOW REPLICA STATUS'
   printf '%s\n' "$status"
   printf 'PASS: 主库新增 %s，等待 GTID 后从库可读，测试记录清理也已复制。\n' "$marker"
-} | tee evidence/replication.txt
+} | sed 's/[[:blank:]]*$//' | tee evidence/replication.txt

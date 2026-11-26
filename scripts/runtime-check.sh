@@ -44,4 +44,4 @@ run() {
   detail "$product" >/dev/null
   printf 'PASS: Compose 三服务停启后，订单 %s 主从一致，从库只读和前端代理查询恢复。\n' "$order"
 }
-run 2>&1 | tee evidence/runtime-acceptance.txt
+run 2>&1 | sed 's/[[:blank:]]*$//' | tee evidence/runtime-acceptance.txt
