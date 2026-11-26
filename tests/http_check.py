@@ -13,7 +13,7 @@ import uuid
 
 import pymysql
 
-BASE = "http://127.0.0.1:" + os.environ["WEB_PORT"] + "/api"
+BASE = os.getenv("OF_TEST_API_BASE") or ("http://127.0.0.1:" + os.environ["WEB_PORT"] + "/api")
 RUN = uuid.uuid4().hex[:9]
 SECRET = os.environ["DEMO_PASSWORD"]
 
@@ -52,7 +52,8 @@ def passed(message):
 
 def connect(port, user="of_app"):
     password = os.environ["DB_APP_PASSWORD" if user == "of_app" else "DB_INSPECT_PASSWORD"]
-    return pymysql.connect(host="127.0.0.1", port=int(os.environ[port]), user=user,
+    host = os.getenv(port.replace("_PORT", "_HOST"), "127.0.0.1")
+    return pymysql.connect(host=host, port=int(os.environ[port]), user=user,
                            password=password, database="orderflow", charset="utf8mb4")
 
 
@@ -221,7 +222,7 @@ def main():
     buyer.call("/auth/logout","POST",expected=204)
     buyer.call("/orders",expected=401)
     passed("登出后原会话失效")
-    Path(".runtime/last-api-test.json").write_text(json.dumps({
+    Path(os.getenv("OF_API_FIXTURE_FILE", ".runtime/last-api-test.json")).write_text(json.dumps({
         "product":product, "order":order, "sku":form["sku"],
     }))
 

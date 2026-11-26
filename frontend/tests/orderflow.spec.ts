@@ -1,5 +1,8 @@
 import { expect, test, type Page } from '@playwright/test'
 import { mkdir } from 'node:fs/promises'
+import { join } from 'node:path'
+
+const screenshotDir = process.env.OF_BROWSER_EVIDENCE_DIR || '../evidence/screenshots'
 
 async function login(page:Page, role:string) {
   await page.goto('/')
@@ -40,13 +43,13 @@ test('商家页面使用从库统计并可查看商品和库存', async ({page})
 
 test('管理员查看实时图表、数据库记录和真实实验截图', async ({page}) => {
   await login(page,'admin')
-  await mkdir('../evidence/screenshots',{recursive:true})
+  await mkdir(screenshotDir,{recursive:true})
   await expect(page.getByRole('img',{name:'最近 30 天销售额趋势图'})).toBeVisible()
   await expect(page.getByText(/从库 72/)).toBeVisible()
-  await page.screenshot({path:'../evidence/screenshots/admin-overview.png',animations:'disabled'})
+  await page.screenshot({path:join(screenshotDir,'admin-overview.png'),animations:'disabled'})
   await page.getByRole('button',{name:'运行状态'}).click()
   await expect(page.getByText('复制正常')).toBeVisible()
-  await page.screenshot({path:'../evidence/screenshots/replica-status.png',animations:'disabled'})
+  await page.screenshot({path:join(screenshotDir,'replica-status.png'),animations:'disabled'})
   await page.getByRole('button',{name:'数据库实验'}).click()
   await page.getByRole('button',{name:'运行 COUNT(*)'}).click()
   await expect(page.getByText('order_items',{exact:true})).toBeVisible({timeout:25000})
@@ -58,12 +61,12 @@ test('管理员查看实时图表、数据库记录和真实实验截图', async
     const line=lines.findIndex(text=>text.includes('01-before'))
     element.scrollTop=Math.max(0,line-2)*parseFloat(getComputedStyle(element).lineHeight)
   })
-  await log.screenshot({path:'../evidence/screenshots/index-comparison.png',animations:'disabled'})
+  await log.screenshot({path:join(screenshotDir,'index-comparison.png'),animations:'disabled'})
   await page.getByRole('button',{name:'日志恢复',exact:true}).click()
   await expect(log).toContainText('PASS: 恢复两笔订单')
   await log.evaluate(element => { element.scrollTop=element.scrollHeight })
-  await log.screenshot({path:'../evidence/screenshots/binlog-recovery.png',animations:'disabled'})
+  await log.screenshot({path:join(screenshotDir,'binlog-recovery.png'),animations:'disabled'})
   await page.getByRole('button',{name:'主从复制',exact:true}).click()
   await expect(log).toContainText('Replica_IO_Running: Yes')
-  await log.screenshot({path:'../evidence/screenshots/replication-log.png',animations:'disabled'})
+  await log.screenshot({path:join(screenshotDir,'replication-log.png'),animations:'disabled'})
 })

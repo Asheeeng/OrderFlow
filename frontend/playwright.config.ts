@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   testDir:'./tests',
-  outputDir:'../.runtime/playwright',
+  outputDir:process.env.OF_BROWSER_OUTPUT_DIR || '../.runtime/playwright',
   workers:1,
   timeout:90000,
   expect:{timeout:22000},
