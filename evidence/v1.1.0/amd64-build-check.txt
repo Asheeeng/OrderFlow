@@ -1,0 +1,51 @@
+backend/Dockerfile
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 742B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/eclipse-temurin:17-jre-jammy
+#2 DONE 2.1s
+
+#3 [internal] load metadata for docker.io/library/maven:3.9.11-eclipse-temurin-17
+#3 DONE 2.7s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 786B done
+#4 DONE 0.0s
+Check complete, no warnings found.
+frontend/Dockerfile
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 501B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/nginx:1.28.0-alpine
+#3 DONE 1.2s
+
+#2 [internal] load metadata for docker.io/library/node:22-bookworm-slim
+#2 DONE 2.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 786B done
+#4 DONE 0.0s
+Check complete, no warnings found.
+deploy/Dockerfile.init
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.init
+#1 transferring dockerfile: 657B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.13-slim-bookworm
+#2 DONE 2.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 786B done
+#3 DONE 0.0s
+Check complete, no warnings found.

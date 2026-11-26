@@ -1,0 +1,1 @@
+PASS: changed embedding namespace blocked retrieval until all 10 vectors rebuilt.

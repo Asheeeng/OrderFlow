@@ -84,7 +84,7 @@ def agent_cases(admin, primary):
 
 
 def rag_cases(admin, customer, primary):
-    built = admin.call("/ai/knowledge/rebuild","POST",{"force":False})
+    built = admin.call("/ai/knowledge/rebuild","POST",{"force":True})
     assert built["documents"]==4 and built["dimension"]==11 and built["embedded"]==10, built
     unchanged = admin.call("/ai/knowledge/rebuild","POST",{"force":False})
     assert unchanged["changed"]==unchanged["embedded"]==0
@@ -185,6 +185,7 @@ def cli():
     merchant.call("/ai/chat","POST",{"question":"库存"},expected=403)
     admin.call("/ai/chat","POST",{"question":"x"*801},expected=400)
     primary = connect("MYSQL_PRIMARY_PORT")
+    primary.autocommit(True)  # Fixtures are written by other application connections between assertions.
     try:
         conversation = agent_cases(admin,primary)
         customer.call(f"/ai/conversations/{conversation}/messages",expected=404)

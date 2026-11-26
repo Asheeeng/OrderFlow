@@ -1,6 +1,6 @@
 # AI 补充答辩题
 
-教师原题见 [30 道 MySQL 答辩题](DEFENSE_QA.md)。AI 部分按下列十题复习。
+教师原题见 [30 道 MySQL 答辩题](DEFENSE_QA.md)。AI 部分按下列十题复习。类名对应 [Java 源码目录](../backend/src/main/java/cn/orderflow)。
 
 ## 1. 什么是 RAG？
 

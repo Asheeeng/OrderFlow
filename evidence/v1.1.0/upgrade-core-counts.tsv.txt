@@ -1,0 +1,15 @@
+table_name	row_count
+users	30000
+merchants	1000
+categories	100
+products	20000
+inventory	20000
+addresses	40000
+cart_items	30000
+orders	400000
+order_items	1000000
+payments	299974
+shipments	252249
+inventory_records	1119611
+product_price_history	1
+total_rows	3212935

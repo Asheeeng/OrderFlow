@@ -1,0 +1,18 @@
+(node:26730) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:26731) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26731) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(node:26731) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/ai.spec.ts:17:1 › Mock Agent 展示工具、数据库表格和 SQL 图形 (2.4s)
+  ✓  2 tests/ai.spec.ts:26:1 › Mock 客服展示取消规则的真实知识片段和引用 (1.3s)
+  ✓  3 tests/ai.spec.ts:35:1 › Mock 商家报告显示可核对的库存指标 (1.4s)
+  ✓  4 tests/orderflow.spec.ts:15:1 › 顾客使用实际目录、分类搜索、详情与购物车 (2.5s)
+  ✓  5 tests/orderflow.spec.ts:35:1 › 商家页面使用从库统计并可查看商品和库存 (1.1s)
+  ✓  6 tests/orderflow.spec.ts:44:1 › 管理员查看实时图表、数据库记录和真实实验截图 (3.2s)
+
+  6 passed (13.4s)

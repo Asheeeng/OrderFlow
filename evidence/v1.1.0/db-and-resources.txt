@@ -1,0 +1,65 @@
+UTC 2026-11-26T15:16:19Z
+Core total	3213056
+table_name	row_count
+users	30012
+merchants	1000
+categories	100
+products	20016
+inventory	20016
+addresses	40012
+cart_items	30005
+orders	400015
+order_items	1000015
+payments	299983
+shipments	252250
+inventory_records	1119630
+product_price_history	2
+check_name	bad
+order_total_or_empty	0
+cross_merchant	0
+product_without_inventory	0
+invalid_owner_role	0
+payment_state_amount_time	0
+shipment_state_time	0
+inventory_balance	0
+missing_or_wrong_order_ledger	0
+unexpected_order_ledger	0
+table_name	row_count
+ai_knowledge_documents	4
+ai_knowledge_chunks	10
+ai_conversations	87
+ai_messages	163
+ai_tool_call_logs	41
+ai_inventory_reports	13
+ai_request_logs	208
+           Replica_IO_Running: Yes
+          Replica_SQL_Running: Yes
+        Seconds_Behind_Source: 0
+                Auto_Position: 1
+Mock usage. Totals include the earlier harness attempt and protocol tests.
+operation	model	status	attempts	reported_tokens
+AGENT_CHAT	fixture-chat	HTTP_503	4	0
+AGENT_CHAT	fixture-chat	OK	64	1152
+AGENT_CHAT	fixture-chat	TIMEOUT	2	0
+INVENTORY	fixture-chat	OK	14	252
+RAG_ANSWER	fixture-chat	OK	43	774
+RAG_INDEX	fixture-embedding	OK	34	102
+RAG_QUERY	fixture-embedding	OK	47	141
+
+Disk MiB (allocated)
+primary 962	/var/lib/mysql
+replica 965	/var/lib/mysql
+redis 1	/data
+
+Sample memory
+orderflow-v110-verify-ai-mock-1 13.71MiB / 3.825GiB
+orderflow-v110-verify-backend-1 237.9MiB / 3.825GiB
+orderflow-v110-verify-frontend-1 6.027MiB / 3.825GiB
+orderflow-v110-verify-primary-1 645.4MiB / 3.825GiB
+orderflow-v110-verify-redis-1 10.87MiB / 3.825GiB
+orderflow-v110-verify-replica-1 700.7MiB / 3.825GiB
+
+Prior instances HTTP
+port 5173 HTTP 200
+port 5273 HTTP 200
+port 5473 HTTP 200

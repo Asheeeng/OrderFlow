@@ -1,0 +1,151 @@
+UTC 2026-11-26T15:09:27Z, isolated project=orderflow-v110-verify
+Docker engine linux/aarch64
+Docker Compose version v5.4.0
+NAME                               IMAGE                            COMMAND                  SERVICE    CREATED          STATUS                      PORTS
+orderflow-v110-verify-backend-1    orderflow-v110-verify-backend    "java -jar /app/orde…"   backend    21 seconds ago   Up 15 seconds (healthy)
+orderflow-v110-verify-frontend-1   orderflow-v110-verify-frontend   "/docker-entrypoint.…"   frontend   20 seconds ago   Up 9 seconds (healthy)      127.0.0.1:5473->80/tcp
+orderflow-v110-verify-init-1       orderflow-v110-verify-init       "python /orderflow/b…"   init       21 seconds ago   Exited (0) 15 seconds ago
+orderflow-v110-verify-primary-1    mysql:8.0.44                     "docker-entrypoint.s…"   primary    20 minutes ago   Up 20 minutes (healthy)     127.0.0.1:16316->3306/tcp
+orderflow-v110-verify-redis-1      redis:7.4.2-alpine               "docker-entrypoint.s…"   redis      20 minutes ago   Up 20 minutes (healthy)     6379/tcp
+orderflow-v110-verify-replica-1    mysql:8.0.44                     "docker-entrypoint.s…"   replica    20 minutes ago   Up 20 minutes (healthy)     127.0.0.1:16307->3306/tcp
+/orderflow-v110-verify-frontend-1 running 0 started=2026-11-26T15:09:18.824913799Z finished=0001-01-01T00:00:00Z
+/orderflow-v110-verify-backend-1 running 0 started=2026-11-26T15:09:12.644474755Z finished=0001-01-01T00:00:00Z
+/orderflow-v110-verify-init-1 exited 0 started=2026-11-26T15:09:09.511520336Z finished=2026-11-26T15:09:12.554369755Z
+init-1  | Preparing schema, accounts and GTID replica
+init-1  | Schema ready: V110__ai.sql
+init-1  | synthetic=true mode=million seed=20261126 start_utc=2026-11-26T15:09:11.371178+00:00
+init-1  | historical data already present orders=400000
+init-1  | READY: mode=million; primary schema, seed, GTID replica and demo accounts verified
+table_name	row_count
+users	30000
+merchants	1000
+categories	100
+products	20000
+inventory	20000
+addresses	40000
+cart_items	30000
+orders	400000
+order_items	1000000
+payments	299974
+shipments	252249
+inventory_records	1119611
+product_price_history	1
+total_rows	3212935
+8.0.44	71	ON	0
+primary integrity
+check_name	bad
+order_total_or_empty	0
+cross_merchant	0
+product_without_inventory	0
+invalid_owner_role	0
+payment_state_amount_time	0
+shipment_state_time	0
+inventory_balance	0
+missing_or_wrong_order_ledger	0
+unexpected_order_ledger	0
+8.0.44	72	ON	1
+replica integrity
+check_name	bad
+order_total_or_empty	0
+cross_merchant	0
+product_without_inventory	0
+invalid_owner_role	0
+payment_state_amount_time	0
+shipment_state_time	0
+inventory_balance	0
+missing_or_wrong_order_ledger	0
+unexpected_order_ledger	0
+                  Source_Host: primary
+           Replica_IO_Running: Yes
+          Replica_SQL_Running: Yes
+           Source_SSL_Allowed: Yes
+        Seconds_Behind_Source: 0
+                Auto_Position: 1
+ Container orderflow-v110-verify-init-run-4d4fc2f99829 Creating
+ Container orderflow-v110-verify-init-run-4d4fc2f99829 Created
+PASS: a second initialization preserved every business-table row count.
+PASS: wrong seed mode was rejected without modifying business data.
+ Container orderflow-v110-verify-init-run-2644abd5d6b2 Creating
+ Container orderflow-v110-verify-init-run-2644abd5d6b2 Created
+2026-11-26T15:10:25.703522+00:00 synthetic=true run=d7dfdc046
+PASS — 三角色登录、未认证、错误密码、角色越权、管理列表与演示地址
+PASS — 注册、分类搜索、游标分页、CSRF、对象越权、上下架、用户及商家启停
+PASS — 下单、减库存、模拟支付、单次支付、发货、收货、改价后成交价保留，order_id=400001
+PASS — 外键 1216、CHECK 3819、唯一键 1062、NOT NULL 1048
+PASS — 取消归还库存、重复取消 409，order_id=400002
+PASS — 管理员可取消待支付订单，顾客端和库存同步更新
+PASS — 前一项先减库存、后一项库存不足触发整单回滚，购物车保留
+PASS — 并发 8 请求 / 3 份库存，3 成功、5 库存冲突，最终库存 0；成功订单 [400006, 400004, 400005]
+PASS — 商家库存调整与流水
+PASS — 主库 71、统计只读从库 72、Redis 实际命中 / 未命中 / 更新失效
+PASS — 登出后原会话失效
+ Container orderflow-v110-verify-frontend-1 Stopping
+ Container orderflow-v110-verify-frontend-1 Stopped
+ Container orderflow-v110-verify-backend-1 Stopping
+ Container orderflow-v110-verify-backend-1 Stopped
+ Container orderflow-v110-verify-init-1 Stopping
+ Container orderflow-v110-verify-redis-1 Stopping
+ Container orderflow-v110-verify-init-1 Stopped
+ Container orderflow-v110-verify-primary-1 Stopping
+ Container orderflow-v110-verify-replica-1 Stopping
+ Container orderflow-v110-verify-redis-1 Stopped
+ Container orderflow-v110-verify-replica-1 Stopped
+ Container orderflow-v110-verify-primary-1 Stopped
+ Container orderflow-v110-verify-primary-1 Recreate
+ Container orderflow-v110-verify-replica-1 Recreate
+ Container orderflow-v110-verify-redis-1 Recreate
+ Container orderflow-v110-verify-redis-1 Recreated
+ Container orderflow-v110-verify-replica-1 Recreated
+ Container orderflow-v110-verify-primary-1 Recreated
+ Container orderflow-v110-verify-init-1 Recreate
+ Container orderflow-v110-verify-init-1 Recreated
+ Container orderflow-v110-verify-backend-1 Recreate
+ Container orderflow-v110-verify-backend-1 Recreated
+ Container orderflow-v110-verify-frontend-1 Recreate
+ Container orderflow-v110-verify-frontend-1 Recreated
+ Container orderflow-v110-verify-replica-1 Starting
+ Container orderflow-v110-verify-primary-1 Starting
+ Container orderflow-v110-verify-redis-1 Starting
+ Container orderflow-v110-verify-redis-1 Started
+ Container orderflow-v110-verify-primary-1 Started
+ Container orderflow-v110-verify-replica-1 Started
+ Container orderflow-v110-verify-primary-1 Waiting
+ Container orderflow-v110-verify-replica-1 Waiting
+ Container orderflow-v110-verify-primary-1 Healthy
+ Container orderflow-v110-verify-replica-1 Healthy
+ Container orderflow-v110-verify-init-1 Starting
+ Container orderflow-v110-verify-init-1 Started
+ Container orderflow-v110-verify-primary-1 Waiting
+ Container orderflow-v110-verify-replica-1 Waiting
+ Container orderflow-v110-verify-redis-1 Waiting
+ Container orderflow-v110-verify-init-1 Waiting
+ Container orderflow-v110-verify-redis-1 Healthy
+ Container orderflow-v110-verify-replica-1 Healthy
+ Container orderflow-v110-verify-primary-1 Healthy
+ Container orderflow-v110-verify-init-1 Exited
+ Container orderflow-v110-verify-backend-1 Starting
+ Container orderflow-v110-verify-backend-1 Started
+ Container orderflow-v110-verify-backend-1 Waiting
+ Container orderflow-v110-verify-backend-1 Healthy
+ Container orderflow-v110-verify-frontend-1 Starting
+ Container orderflow-v110-verify-frontend-1 Started
+ Container orderflow-v110-verify-primary-1 Waiting
+ Container orderflow-v110-verify-replica-1 Waiting
+ Container orderflow-v110-verify-redis-1 Waiting
+ Container orderflow-v110-verify-init-1 Waiting
+ Container orderflow-v110-verify-backend-1 Waiting
+ Container orderflow-v110-verify-frontend-1 Waiting
+ Container orderflow-v110-verify-init-1 Exited
+ Container orderflow-v110-verify-replica-1 Healthy
+ Container orderflow-v110-verify-primary-1 Healthy
+ Container orderflow-v110-verify-redis-1 Healthy
+ Container orderflow-v110-verify-backend-1 Healthy
+ Container orderflow-v110-verify-frontend-1 Healthy
+PASS: after container recreation MySQL counts, order 400006, replica read-only and Redis AOF persisted.
+NAME                               IMAGE                            COMMAND                  SERVICE    CREATED              STATUS                        PORTS
+orderflow-v110-verify-backend-1    orderflow-v110-verify-backend    "java -jar /app/orde…"   backend    About a minute ago   Up 15 seconds (healthy)
+orderflow-v110-verify-frontend-1   orderflow-v110-verify-frontend   "/docker-entrypoint.…"   frontend   About a minute ago   Up 9 seconds (healthy)        127.0.0.1:5473->80/tcp
+orderflow-v110-verify-init-1       orderflow-v110-verify-init       "python /orderflow/b…"   init       About a minute ago   Exited (0) 15 seconds ago
+orderflow-v110-verify-primary-1    mysql:8.0.44                     "docker-entrypoint.s…"   primary    About a minute ago   Up About a minute (healthy)   127.0.0.1:16316->3306/tcp
+orderflow-v110-verify-redis-1      redis:7.4.2-alpine               "docker-entrypoint.s…"   redis      About a minute ago   Up About a minute (healthy)   6379/tcp
+orderflow-v110-verify-replica-1    mysql:8.0.44                     "docker-entrypoint.s…"   replica    About a minute ago   Up About a minute (healthy)   127.0.0.1:16307->3306/tcp
