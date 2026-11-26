@@ -1,0 +1,125 @@
+name: orderflow-docker
+
+x-mysql: &mysql
+  image: mysql:8.0.44
+  restart: unless-stopped
+  environment:
+    MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Generate a Docker environment file first}
+    MYSQL_ROOT_HOST: localhost
+  healthcheck:
+    test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysql -h 127.0.0.1 --protocol=TCP -uroot -Nse 'SELECT 1'"]
+    interval: 5s
+    timeout: 4s
+    start_period: 30s
+    retries: 30
+
+services:
+  primary:
+    <<: *mysql
+    command: ["--socket=/run/orderflow/mysql.sock", "--server-id=71", "--log-bin=of-bin", "--binlog-format=ROW", "--gtid-mode=ON", "--enforce-gtid-consistency=ON", "--local-infile=ON", "--innodb-buffer-pool-size=256M", "--default-time-zone=+00:00"]
+    ports:
+      - "127.0.0.1:${MYSQL_PRIMARY_PORT:-13316}:3306"
+    volumes:
+      - primary_data:/var/lib/mysql
+      - primary_socket:/run/orderflow
+
+  replica:
+    <<: *mysql
+    command: ["--socket=/run/orderflow/mysql.sock", "--server-id=72", "--log-bin=of-bin", "--binlog-format=ROW", "--gtid-mode=ON", "--enforce-gtid-consistency=ON", "--relay-log=of-relay", "--relay-log-recovery=ON", "--innodb-buffer-pool-size=256M", "--default-time-zone=+00:00"]
+    ports:
+      - "127.0.0.1:${MYSQL_REPLICA_PORT:-13307}:3306"
+    volumes:
+      - replica_data:/var/lib/mysql
+      - replica_socket:/run/orderflow
+
+  redis:
+    image: redis:7.4.2-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Generate a Docker environment file first}
+    command: ["sh", "-ec", "umask 077; printf 'requirepass %s\nappendonly yes\n' \"$$REDIS_PASSWORD\" > /tmp/orderflow-redis.conf; chown redis:redis /tmp/orderflow-redis.conf; exec docker-entrypoint.sh redis-server /tmp/orderflow-redis.conf"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$$REDIS_PASSWORD\" redis-cli ping | grep -qx PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  init:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.init
+    restart: "no"
+    environment:
+      SEED_MODE: ${SEED_MODE:-million}
+      MYSQL_PRIMARY_HOST: primary
+      MYSQL_PRIMARY_PORT: "3306"
+      DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Generate a Docker environment file first}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:?Generate a Docker environment file first}
+      DB_INSPECT_PASSWORD: ${DB_INSPECT_PASSWORD:?Generate a Docker environment file first}
+      DB_REPL_PASSWORD: ${DB_REPL_PASSWORD:?Generate a Docker environment file first}
+      DEMO_PASSWORD: ${DEMO_PASSWORD:?Generate a Docker environment file first}
+    depends_on:
+      primary:
+        condition: service_healthy
+      replica:
+        condition: service_healthy
+    volumes:
+      - primary_socket:/run/orderflow/primary:ro
+      - replica_socket:/run/orderflow/replica:ro
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      SERVER_ADDRESS: 0.0.0.0
+      API_PORT: "8080"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://primary:3306/orderflow?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true"
+      ORDERFLOW_REPLICA_URL: "jdbc:mysql://replica:3306/orderflow?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true"
+      SPRING_DATA_REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:?Generate a Docker environment file first}
+      DB_INSPECT_PASSWORD: ${DB_INSPECT_PASSWORD:?Generate a Docker environment file first}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Generate a Docker environment file first}
+      OF_EVIDENCE_DIR: /app/evidence
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      primary:
+        condition: service_healthy
+      replica:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-ec", "exec 3<>/dev/tcp/127.0.0.1/8080; printf 'GET /api/categories HTTP/1.0\r\nHost: localhost\r\n\r\n' >&3; read -r status <&3; [[ $$status == *' 200 '* ]]"]
+      start_period: 20s
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${WEB_PORT:-5173}:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/api/categories"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  primary_data:
+  replica_data:
+  redis_data:
+  primary_socket:
+  replica_socket:

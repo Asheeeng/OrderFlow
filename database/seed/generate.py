@@ -180,7 +180,8 @@ def main():
     products, by_shop = catalog(spec, rng)
     begin = time.monotonic()
     print(f"synthetic=true mode={args.mode} seed={SEED} start_utc={datetime.now(timezone.utc).isoformat()}", flush=True)
-    conn = pymysql.connect(host="127.0.0.1", port=int(os.environ["MYSQL_PRIMARY_PORT"]),
+    conn = pymysql.connect(host=os.environ.get("MYSQL_PRIMARY_HOST", "127.0.0.1"),
+                           port=int(os.environ["MYSQL_PRIMARY_PORT"]),
                            user="of_app", password=os.environ["DB_APP_PASSWORD"],
                            database="orderflow", charset="utf8mb4", autocommit=False, local_infile=True)
     try:

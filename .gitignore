@@ -42,3 +42,5 @@ redis-data/
 *.tsv
 *.backup.sql
 dump-*.sql
+
+!.env.docker.example
