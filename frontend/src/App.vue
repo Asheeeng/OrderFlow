@@ -5,16 +5,22 @@ import { ArrowLeft, ArrowRight, Box, Collection, DataAnalysis, Goods, Odometer, 
 import { actor, api, currency, displayTime, integer, roles, statuses, type Actor, type Page, type Role, type Row } from './api'
 
 const Trend = defineAsyncComponent(() => import('./Trend.vue'))
+const AiPanel = defineAsyncComponent(() => import('./AiPanel.vue'))
+const aiModes = ['agent','rag','knowledge','inventory']
 const menus = {
-  CUSTOMER: [['catalog','商品目录',Goods], ['cart','我的购物车',ShoppingCart], ['orders','我的订单',Tickets]],
-  MERCHANT: [['overview','销售概览',DataAnalysis], ['products','商品与库存',Box], ['orders','订单处理',Van]],
+  CUSTOMER: [['catalog','商品目录',Goods], ['cart','我的购物车',ShoppingCart], ['orders','我的订单',Tickets], ['rag','智能客服',Collection]],
+  MERCHANT: [['overview','销售概览',DataAnalysis], ['products','商品与库存',Box], ['orders','订单处理',Van], ['inventory','AI 库存分析',DataAnalysis]],
   ADMIN: [['overview','平台概览',DataAnalysis], ['orders','订单管理',Tickets], ['products','商品管理',Box],
-    ['users','用户管理',User], ['merchants','商家管理',Goods], ['labs','数据库实验',Collection], ['system','运行状态',Odometer]],
+    ['users','用户管理',User], ['merchants','商家管理',Goods], ['labs','数据库实验',Collection], ['system','运行状态',Odometer], ['agent','AI 数据助手',DataAnalysis], ['knowledge','客服知识库',Collection]],
 } as const
 const menu = computed(() => actor.value ? menus[actor.value.role] : [])
 const view = ref('')
 const title = computed(() => menu.value.find(item => item[0] === view.value)?.[1] ?? '')
 const intro: Record<string,string> = {
+  agent: '用自然语言查询平台数据，核对 SQL 工具结果。',
+  rag: '根据公共业务规则回答问题，并显示引用。',
+  inventory: '按店铺实际销量和库存生成只读补货建议。',
+  knowledge: '管理客服文档、向量空间与检索结果。',
   overview: '订单、销售及商品统计由只读从库提供。',
   catalog: '按商品名称或分类查找在售商品。',
   cart: '检查商品数量并选择收货地址。',
@@ -276,6 +282,7 @@ const roleName = (role?: Role) => role ? roles[role] : ''
       <form class="auth-form" @submit.prevent="signIn">
         <h1>{{ registering ? '创建顾客账户' : '登录 OrderFlow' }}</h1>
         <p>{{ registering ? '填写用户名、密码和显示名称。' : '使用顾客、商家或管理员账号登录。' }}</p>
+        <AiPanel v-if="aiModes.includes(view)" :key="view" :mode="view" />
         <p v-if="error" class="notice error" role="alert">{{ error }}</p>
         <p v-if="notice" class="notice" role="status">{{ notice }}</p>
         <label>用户名<el-input v-model="username" aria-label="用户名" autocomplete="username" maxlength="40" required /></label>
