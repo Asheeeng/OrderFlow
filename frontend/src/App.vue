@@ -282,7 +282,6 @@ const roleName = (role?: Role) => role ? roles[role] : ''
       <form class="auth-form" @submit.prevent="signIn">
         <h1>{{ registering ? '创建顾客账户' : '登录 OrderFlow' }}</h1>
         <p>{{ registering ? '填写用户名、密码和显示名称。' : '使用顾客、商家或管理员账号登录。' }}</p>
-        <AiPanel v-if="aiModes.includes(view)" :key="view" :mode="view" />
         <p v-if="error" class="notice error" role="alert">{{ error }}</p>
         <p v-if="notice" class="notice" role="status">{{ notice }}</p>
         <label>用户名<el-input v-model="username" aria-label="用户名" autocomplete="username" maxlength="40" required /></label>
@@ -315,6 +314,7 @@ const roleName = (role?: Role) => role ? roles[role] : ''
         <div class="page-title"><div><h1>{{ title }}</h1><p>{{ intro[view] }}</p></div>
           <el-button plain :icon="Refresh" :loading="loading" @click="load">刷新</el-button>
         </div>
+        <AiPanel v-if="aiModes.includes(view)" :key="view" :mode="view" />
         <p v-if="error" class="notice error" role="alert">{{ error }}</p>
         <p v-if="notice" class="notice" role="status">{{ notice }}</p>
 

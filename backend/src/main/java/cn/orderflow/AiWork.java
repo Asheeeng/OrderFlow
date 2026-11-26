@@ -26,6 +26,7 @@ class AiWork {
 
     static String safePrompt(String input) {
         return input.strip()
+            .replaceAll("(?im)((?:密码|口令|密钥|token|收货地址|详细地址|身份证号)\\s*[:：=]\\s*)[^\\r\\n，。；]+", "$1[已遮盖]")
             .replaceAll("(?i)(?:sk-[0-9A-Za-z_-]{8,}|[0-9A-Za-z.!#$%&'*+/=?^_`{|}~-]+@[0-9A-Za-z.-]+\\.[A-Za-z]{2,}|(?<![0-9])[0-9]{11,}(?![0-9]))", "[已遮盖]");
     }
 }

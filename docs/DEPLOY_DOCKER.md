@@ -61,3 +61,7 @@ docker compose -p orderflow-docker -f compose.docker.yml --env-file .env.docker 
 前后端 Dockerfile 的构建阶段在 BuildKit 的构建平台运行，产物为静态网页和 Java 17 JAR。最终运行阶段选取目标平台的 Nginx 或 Temurin。Python 初始化服务在目标架构安装依赖。项目选用同时提供 Linux ARM64 和 AMD64 的基础镜像。Windows 需要通过 WSL 2 运行 Linux 容器。平台验收边界、实际数据量和运行记录见 [V1.0.1 验收证据](../evidence/v1.0.1/README.md)。
 
 复现百万档验收请在已独立启动的测试项目运行 `tests/compose_acceptance.sh`，并传入其 `ORDERFLOW_PROJECT` 和 `ORDERFLOW_ENV_FILE`。该脚本会创建合成测试业务并重新创建测试容器来验证卷持久化。
+
+## V1.1 可选 AI 模块
+
+沿用相同项目、数据库与数据卷。主库初始化会执行增量 SQL 并等待复制，原业务数据继续复用。模型密钥通过既有环境文件仅注入运行中的后端，构建无需密钥。升级和模型设置见 [升级指南](UPGRADE_V1.1.md) 与 [模型配置](AI_CONFIG.md)。

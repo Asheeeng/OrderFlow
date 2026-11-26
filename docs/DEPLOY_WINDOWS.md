@@ -70,3 +70,7 @@ SELECT COUNT(*) FROM orderflow.order_items;
 `.\stop.ps1` 停止服务，命名数据卷继续保留。再次运行 `.\start.ps1` 会重新确认主从和种子状态，已有数据保留。首次想用小数据时可运行 `.\start.ps1 -Mode small`。要同时保有两种模式，请用 [独立实例配置](DEPLOY_DOCKER.md#端口和实例隔离)。
 
 Windows 说明依据 Docker Desktop 与 Microsoft 的官方流程。实际测试平台和 PowerShell 验证边界见 [V1.0.1 验收证据](../evidence/v1.0.1/README.md)。
+
+## 已部署 V1.0.1 的组员
+
+保留原 `.env.docker`、项目名及命名卷。获取候选代码后，在原项目目录重新运行 `.\start.ps1`。原自定义路径和端口按之前参数运行。升级与模型启用可以分开进行。[保留数据升级](UPGRADE_V1.1.md)

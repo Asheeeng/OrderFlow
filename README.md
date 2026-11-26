@@ -2,6 +2,12 @@
 
 OrderFlow 是一个本地电商订单与库存系统，覆盖顾客购买、商家履约和管理员运营。MySQL 主库保存业务写入，只读从库提供历史统计，Redis 缓存商品展示字段。历史业务数据和所有验收账户均为合成数据。
 
+## V1.1 AI 候选版
+
+新增管理员数据助手、顾客 RAG 智能客服、商家 AI 库存分析。默认关闭模型调用，可以先升级继续使用基础业务。
+
+[AI 架构](docs/AI_ARCHITECTURE.md) · [配置模型](docs/AI_CONFIG.md) · [保留数据升级](docs/UPGRADE_V1.1.md) · [AI 验收](evidence/v1.1.0/README.md)
+
 ## V1.0.1 全 Docker 快速启动
 
 部署只需要 **Docker Desktop 和 Git**。默认导入百万级合成数据。首次构建与导入完成后，打开 [OrderFlow](http://127.0.0.1:5173/)。

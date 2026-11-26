@@ -114,7 +114,7 @@ def inventory_cases(merchant, primary):
     buyer, _, address = new_customer("ai_"+NONCE)
     profiles = [(10,0,"LOW_STOCK"),(0,0,"OUT_OF_STOCK"),(40,0,"NO_SALES"),(44,1,"SLOW_STOCK"),
                 (50,4,"NORMAL"),(14,12,"HIGH_DEMAND_LOW_STOCK"),(12,12,"OUT_OF_STOCK"),
-                (20,10,"NORMAL"),(3,1,"LOW_STOCK"),(80,2,"SLOW_STOCK")]
+                (30,10,"NORMAL"),(3,1,"LOW_STOCK"),(80,2,"SLOW_STOCK")]
     today = datetime.now(timezone.utc).date().isoformat()
 
     def product_fixture(opening, qty, suffix):
@@ -151,7 +151,7 @@ def inventory_cases(merchant, primary):
                 {"risk":risk,"available":opening-qty,"sales_30":qty},
                 partial(merchant.call,"/ai/inventory","POST",{"asOf":today,"productId":product}),verify)
     merchant.call("/ai/inventory","POST",{"productId":2},expected=404)  # Same seed: product 2 belongs to merchant 2.
-    invalid = product_fixture(997,3,11)
+    invalid = product_fixture(1000,3,11)
     merchant.call("/ai/inventory","POST",{"productId":invalid},expected=502)
 
 
