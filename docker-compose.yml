@@ -1,0 +1,46 @@
+name: orderflow
+x-mysql: &mysql
+  image: mysql:8.0.44
+  restart: unless-stopped
+  environment:
+    MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?run scripts/init.sh}
+    MYSQL_ROOT_HOST: localhost
+  healthcheck:
+    test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysql -uroot -Nse 'SELECT 1'"]
+    interval: 3s
+    timeout: 4s
+    retries: 45
+services:
+  primary:
+    <<: *mysql
+    command: ["--server-id=71", "--log-bin=of-bin", "--binlog-format=ROW", "--gtid-mode=ON", "--enforce-gtid-consistency=ON", "--local-infile=ON", "--innodb-buffer-pool-size=256M", "--default-time-zone=+00:00"]
+    ports:
+      - "127.0.0.1:${MYSQL_PRIMARY_PORT:-13306}:3306"
+    volumes:
+      - primary_data:/var/lib/mysql
+  replica:
+    <<: *mysql
+    command: ["--server-id=72", "--log-bin=of-bin", "--binlog-format=ROW", "--gtid-mode=ON", "--enforce-gtid-consistency=ON", "--relay-log=of-relay", "--relay-log-recovery=ON", "--read-only=ON", "--super-read-only=ON", "--innodb-buffer-pool-size=256M", "--default-time-zone=+00:00"]
+    ports:
+      - "127.0.0.1:${MYSQL_REPLICA_PORT:-13307}:3306"
+    volumes:
+      - replica_data:/var/lib/mysql
+  redis:
+    image: redis:7.4.2-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?run scripts/init.sh}
+    command: ["sh", "-ec", "umask 077; printf 'requirepass %s\nappendonly yes\n' \"$$REDIS_PASSWORD\" > /tmp/orderflow-redis.conf; exec docker-entrypoint.sh redis-server /tmp/orderflow-redis.conf"]
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-16390}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$$REDIS_PASSWORD\" redis-cli ping | grep -qx PONG"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+volumes:
+  primary_data:
+  replica_data:
+  redis_data:
