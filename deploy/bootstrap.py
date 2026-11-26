@@ -152,7 +152,7 @@ def main(secrets):
             if value(primary, "SELECT GET_LOCK('orderflow_compose_bootstrap',30)") != 1:
                 raise RuntimeError("Another Compose initialization job holds the bootstrap lock")
             print("Preparing schema, accounts and GTID replica")
-            configure_primary(primary)
+            configure_primary(primary, secrets)
             configure_replica(replica, secrets["DB_REPL_PASSWORD"])
             wait_for_replica(primary, replica)
             subprocess.run([sys.executable, str(DATABASE / "seed/generate.py"), mode], check=True)
