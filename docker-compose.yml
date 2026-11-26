@@ -15,22 +15,22 @@ services:
     <<: *mysql
     command: ["--server-id=71", "--log-bin=of-bin", "--binlog-format=ROW", "--gtid-mode=ON", "--enforce-gtid-consistency=ON", "--local-infile=ON", "--innodb-buffer-pool-size=256M", "--default-time-zone=+00:00"]
     ports:
-      - "127.0.0.1:${MYSQL_PRIMARY_PORT:-13306}:3306"
+      - "127.0.0.1:${MYSQL_PRIMARY_PORT:-13316}:3306"
     volumes:
       - primary_data:/var/lib/mysql
   replica:
     <<: *mysql
-    command: ["--server-id=72", "--log-bin=of-bin", "--binlog-format=ROW", "--gtid-mode=ON", "--enforce-gtid-consistency=ON", "--relay-log=of-relay", "--relay-log-recovery=ON", "--read-only=ON", "--super-read-only=ON", "--innodb-buffer-pool-size=256M", "--default-time-zone=+00:00"]
+    command: ["--server-id=72", "--log-bin=of-bin", "--binlog-format=ROW", "--gtid-mode=ON", "--enforce-gtid-consistency=ON", "--relay-log=of-relay", "--relay-log-recovery=ON", "--innodb-buffer-pool-size=256M", "--default-time-zone=+00:00"]
     ports:
       - "127.0.0.1:${MYSQL_REPLICA_PORT:-13307}:3306"
     volumes:
-      - replica_data:/var/lib/mysql
+      - replica_store:/var/lib/mysql
   redis:
     image: redis:7.4.2-alpine
     restart: unless-stopped
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?run scripts/init.sh}
-    command: ["sh", "-ec", "umask 077; printf 'requirepass %s\nappendonly yes\n' \"$$REDIS_PASSWORD\" > /tmp/orderflow-redis.conf; exec docker-entrypoint.sh redis-server /tmp/orderflow-redis.conf"]
+    command: ["sh", "-ec", "umask 077; printf 'requirepass %s\nappendonly yes\n' \"$$REDIS_PASSWORD\" > /tmp/orderflow-redis.conf; chown redis:redis /tmp/orderflow-redis.conf; exec docker-entrypoint.sh redis-server /tmp/orderflow-redis.conf"]
     ports:
       - "127.0.0.1:${REDIS_PORT:-16390}:6379"
     volumes:
@@ -42,5 +42,5 @@ services:
       retries: 30
 volumes:
   primary_data:
-  replica_data:
+  replica_store:
   redis_data:

@@ -1,0 +1,34 @@
+spring:
+  application.name: OrderFlow
+  datasource:
+    url: jdbc:mysql://127.0.0.1:${MYSQL_PRIMARY_PORT:13316}/orderflow?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
+    username: of_app
+    password: ${DB_APP_PASSWORD}
+    hikari:
+      pool-name: orderflow-primary
+      maximum-pool-size: 16
+      connection-timeout: 2500
+  data:
+    redis:
+      host: 127.0.0.1
+      port: ${REDIS_PORT:16390}
+      password: ${REDIS_PASSWORD}
+      timeout: 250ms
+      connect-timeout: 350ms
+server:
+  address: 127.0.0.1
+  port: ${API_PORT:8080}
+  servlet.session:
+    timeout: 60m
+    cookie:
+      http-only: true
+      same-site: strict
+      name: ORDERFLOW_SESSION
+orderflow:
+  replica:
+    url: jdbc:mysql://127.0.0.1:${MYSQL_REPLICA_PORT:13307}/orderflow?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
+    username: of_inspect
+    password: ${DB_INSPECT_PASSWORD}
+  evidence-dir: ${OF_EVIDENCE_DIR:../evidence}
+mybatis-plus:
+  global-config.banner: false

@@ -33,6 +33,7 @@ initialize() {
     value="${!key}"
     [[ "$value" =~ ^[a-zA-Z0-9]{16,72}$ ]] || { echo "$key 需要 16–72 位字母数字" >&2; return 1; }
   done
+  [[ ${#DB_REPL_PASSWORD} -le 32 ]] || { echo 'MySQL 复制用户密码最多 32 位' >&2; return 1; }
   db primary < database/schema/001_tables.sql
   if [[ "$(db primary -Nse "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema='orderflow' AND index_name='idx_orders_date'")" == 0 ]]; then
     db primary < database/indexes/001_indexes.sql
@@ -41,6 +42,7 @@ initialize() {
     db primary < database/schema/002_routines.sql
   fi
   sed -e "s/@APP_PASSWORD@/$DB_APP_PASSWORD/g" -e "s/@INSPECT_PASSWORD@/$DB_INSPECT_PASSWORD/g" -e "s/@REPL_PASSWORD@/$DB_REPL_PASSWORD/g" database/replication/accounts.sql | db primary
+  db replica -e 'SET PERSIST super_read_only=ON'
   status="$(db replica -e 'SHOW REPLICA STATUS\G')"
   if [[ -z "$status" ]]; then
     sed -e "s/@SOURCE_HOST@/$source_host/g" -e "s/@SOURCE_PORT@/$source_port/g" -e "s/@REPL_PASSWORD@/$DB_REPL_PASSWORD/g" database/replication/replica.sql | db replica >/dev/null
