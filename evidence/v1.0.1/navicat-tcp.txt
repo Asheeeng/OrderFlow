@@ -1,0 +1,17 @@
+Navicat-equivalent TCP verification 127.0.0.1:14316 / of_inspect / orderflow
+@@server_id	@@GLOBAL.super_read_only
+71	0
+COUNT(*)
+1000006
+TRIGGER_NAME	EVENT_MANIPULATION	EVENT_OBJECT_TABLE	ACTION_TIMING	ACTION_STATEMENT
+product_price_audit	UPDATE	products	AFTER	BEGIN\n  IF OLD.price <> NEW.price THEN\n    INSERT INTO product_price_history(product_id,old_price,new_price) VALUES(OLD.id,OLD.price,NEW.price);\n  END IF;\nEND
+ERROR 1142 (42000) at line 1: UPDATE command denied to user 'of_inspect'@'172.23.0.1' for table 'users'
+Navicat-equivalent TCP verification 127.0.0.1:14307 / of_inspect / orderflow
+@@server_id	@@GLOBAL.super_read_only
+72	1
+COUNT(*)
+1000006
+TRIGGER_NAME	EVENT_MANIPULATION	EVENT_OBJECT_TABLE	ACTION_TIMING	ACTION_STATEMENT
+product_price_audit	UPDATE	products	AFTER	BEGIN\n  IF OLD.price <> NEW.price THEN\n    INSERT INTO product_price_history(product_id,old_price,new_price) VALUES(OLD.id,OLD.price,NEW.price);\n  END IF;\nEND
+ERROR 1290 (HY000) at line 1: The MySQL server is running with the --read-only option so it cannot execute this statement
+PASS: both published MySQL ports allow read-only protocol access after recreation.

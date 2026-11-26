@@ -1,0 +1,24 @@
+UTC 2026-11-26T14:18:23Z
+Host platform arm64
+ProductName:		macOS
+ProductVersion:		15.5
+BuildVersion:		24F74
+1fd0d523edc0c3bd959fce3a31e6d315f90a48ba
+host frontend health HTTP 200
+primary 1000007
+replica 1000007
+524cf921692383defb4ca1621393284f23b3cff2df4f4adafac54b46f4658e97
+81bcfff8caa13122661f4d18d98d1c945148fda4f30c8df1b1d6b4b6176444e1
+d0932268560a14e039fc030e39d76c407244ba392bbad8ffbe59c7bf41169077
+PASS: original V1.0 host endpoints, data and container identities unchanged.
+orderflow-v101-verify-backend:latest linux/arm64
+orderflow-v101-verify-frontend:latest linux/arm64
+orderflow-v101-verify-init:latest linux/arm64
+frontend 127.0.0.1 5173
+primary 127.0.0.1 13316
+replica 127.0.0.1 13307
+PASS: default loopback ports verified; backend and Redis have no published host ports.
+.env.docker file mode 600
+.env.docker
+.env.docker.wrapper-check
+.env.docker.v101-verify

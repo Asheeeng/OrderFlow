@@ -1,0 +1,18 @@
+UTC 2026-11-26T14:15:37Z, isolated project=orderflow-v101-small
+NAME                              IMAGE                           COMMAND                  SERVICE    CREATED              STATUS                        PORTS
+orderflow-v101-small-backend-1    orderflow-v101-small-backend    "java -jar /app/orde…"   backend    About a minute ago   Up 58 seconds (healthy)       8080/tcp
+orderflow-v101-small-frontend-1   orderflow-v101-small-frontend   "/docker-entrypoint.…"   frontend   About a minute ago   Up 52 seconds (healthy)       127.0.0.1:5373->80/tcp
+orderflow-v101-small-init-1       orderflow-v101-small-init       "python /orderflow/b…"   init       About a minute ago   Exited (0) 58 seconds ago
+orderflow-v101-small-primary-1    mysql:8.0.44                    "docker-entrypoint.s…"   primary    About a minute ago   Up About a minute (healthy)   127.0.0.1:15316->3306/tcp
+orderflow-v101-small-redis-1      redis:7.4.2-alpine              "docker-entrypoint.s…"   redis      About a minute ago   Up About a minute (healthy)   6379/tcp
+orderflow-v101-small-replica-1    mysql:8.0.44                    "docker-entrypoint.s…"   replica    About a minute ago   Up About a minute (healthy)   127.0.0.1:15307->3306/tcp
+init-1  | Preparing schema, accounts and GTID replica
+init-1  | synthetic=true mode=small seed=20261126 start_utc=2026-11-26T14:14:38.886753+00:00
+init-1  | reference data committed users=120 products=160
+init-1  | generating and importing order batches from=1 target=400
+init-1  | committed orders=400 elapsed_s=0.57
+init-1  | READY: mode=small; primary schema, seed, GTID replica and demo accounts verified
+primary order_items=1000
+replica order_items=1000
+Nginx /api/categories HTTP 200
+PASS: fresh small initialization and frontend readiness.
