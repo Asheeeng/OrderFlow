@@ -37,6 +37,10 @@ initialize() {
     db primary < database/schema/003_inspection.sql
   fi
   sed -e "s/@APP_PASSWORD@/$DB_APP_PASSWORD/g" -e "s/@INSPECT_PASSWORD@/$DB_INSPECT_PASSWORD/g" -e "s/@REPL_PASSWORD@/$DB_REPL_PASSWORD/g" database/replication/accounts.sql | db primary
+  local migration
+  for migration in database/migrations/V*__*.sql; do
+    db primary < "$migration"
+  done
   db replica -e 'SET PERSIST super_read_only=ON'
   status="$(db replica -e 'SHOW REPLICA STATUS\G')"
   if [[ -z "$status" ]]; then

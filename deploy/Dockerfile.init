@@ -4,6 +4,7 @@ ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 COPY database/seed/requirements.txt /tmp/requirements.txt
 RUN --mount=type=cache,target=/root/.cache/pip pip install --disable-pip-version-check --only-binary=:all: -r /tmp/requirements.txt
 COPY database/schema ./database/schema
+COPY database/migrations ./database/migrations
 COPY database/indexes ./database/indexes
 COPY database/replication ./database/replication
 COPY database/seed/generate.py ./database/seed/generate.py

@@ -153,6 +153,9 @@ def main(secrets):
                 raise RuntimeError("Another Compose initialization job holds the bootstrap lock")
             print("Preparing schema, accounts and GTID replica")
             configure_primary(primary, secrets)
+            for migration in sorted((DATABASE / "migrations").glob("V*__*.sql")):
+                run_sql(primary, migration.relative_to(DATABASE))
+                print(f"Schema ready: {migration.name}")
             configure_replica(replica, secrets["DB_REPL_PASSWORD"])
             wait_for_replica(primary, replica)
             subprocess.run([sys.executable, str(DATABASE / "seed/generate.py"), mode], check=True)

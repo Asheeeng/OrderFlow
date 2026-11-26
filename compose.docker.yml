@@ -85,6 +85,16 @@ services:
       DB_INSPECT_PASSWORD: ${DB_INSPECT_PASSWORD:?Generate a Docker environment file first}
       REDIS_PASSWORD: ${REDIS_PASSWORD:?Generate a Docker environment file first}
       OF_EVIDENCE_DIR: /app/evidence
+      AI_ENABLED: ${AI_ENABLED:-false}
+      AI_BASE_URL: ${AI_BASE_URL:-}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_CHAT_MODEL: ${AI_CHAT_MODEL:-}
+      AI_EMBEDDING_BASE_URL: ${AI_EMBEDDING_BASE_URL:-}
+      AI_EMBEDDING_API_KEY: ${AI_EMBEDDING_API_KEY:-}
+      AI_EMBEDDING_MODEL: ${AI_EMBEDDING_MODEL:-}
+      AI_EMBEDDING_VERSION: ${AI_EMBEDDING_VERSION:-1}
+      AI_DAILY_CALL_LIMIT: ${AI_DAILY_CALL_LIMIT:-300}
+      AI_USER_MINUTE_LIMIT: ${AI_USER_MINUTE_LIMIT:-20}
     depends_on:
       init:
         condition: service_completed_successfully

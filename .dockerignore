@@ -33,3 +33,6 @@
 !evidence/binlog.txt
 !evidence/replication.txt
 !evidence/api-acceptance.txt
+
+!database/migrations/
+!database/migrations/*.sql
