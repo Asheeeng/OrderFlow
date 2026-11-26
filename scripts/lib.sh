@@ -9,15 +9,7 @@ set +a
 db() {
   local service="$1"
   shift
-  case "${OF_RUNTIME:-docker}" in
-    docker)
-      docker compose exec -T "$service" sh -c 'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; exec mysql --default-character-set=utf8mb4 -uroot "$@"' mysql "$@"
-      ;;
-    native)
-      MYSQL_PWD="$DB_ROOT_PASSWORD" mysql --default-character-set=utf8mb4 -uroot --socket="$root/.runtime/$service/mysql.sock" "$@"
-      ;;
-    *) printf '未知运行方式 %s\n' "$OF_RUNTIME" >&2; return 2 ;;
-  esac
+  docker compose exec -T "$service" sh -c 'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; exec mysql --default-character-set=utf8mb4 -uroot "$@"' mysql "$@"
 }
 
 wait_replica() {
@@ -40,6 +32,9 @@ initialize() {
   fi
   if [[ "$(db primary -Nse "SELECT COUNT(*) FROM information_schema.triggers WHERE trigger_schema='orderflow' AND trigger_name='product_price_audit'")" == 0 ]]; then
     db primary < database/schema/002_routines.sql
+  fi
+  if [[ "$(db primary -Nse "SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema='orderflow' AND routine_name='inspect_orderflow_triggers'")" == 0 ]]; then
+    db primary < database/schema/003_inspection.sql
   fi
   sed -e "s/@APP_PASSWORD@/$DB_APP_PASSWORD/g" -e "s/@INSPECT_PASSWORD@/$DB_INSPECT_PASSWORD/g" -e "s/@REPL_PASSWORD@/$DB_REPL_PASSWORD/g" database/replication/accounts.sql | db primary
   db replica -e 'SET PERSIST super_read_only=ON'

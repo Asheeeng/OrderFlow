@@ -5,7 +5,9 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from itertools import islice
 import os
+from pathlib import Path
 import random
+from tempfile import TemporaryDirectory
 import time
 
 import bcrypt
@@ -124,7 +126,27 @@ def generate_orders(spec, by_shop, rng):
         yield order, entries, payment, shipment, reserves + releases
 
 
-def write_orders(cursor, batch):
+def load_rows(cursor, folder, table, columns, rows):
+    if not rows:
+        return
+    path = folder / (table + ".tsv")
+
+    def field(value):
+        if value is None:
+            return r"\N"
+        return str(value).replace("\\", "\\\\").replace("\t", r"\t").replace("\n", r"\n").replace("\r", r"\r")
+
+    with path.open("w", encoding="utf-8", newline="") as data:
+        for row in rows:
+            data.write("\t".join(field(value) for value in row) + "\n")
+    cursor.execute(f"""LOAD DATA LOCAL INFILE %s INTO TABLE {table} CHARACTER SET utf8mb4
+        FIELDS TERMINATED BY '\\t' ESCAPED BY '\\\\' LINES TERMINATED BY '\\n' ({columns})""", (str(path),))
+    if cursor.rowcount != len(rows) or cursor.warning_count:
+        cursor.execute("SHOW WARNINGS LIMIT 5")
+        raise RuntimeError(f"批量导入 {table} 出现警告或数量不符: {cursor.fetchall()}")
+
+
+def write_orders(cursor, batch, folder):
     orders, items, payments, shipments, ledger = [], [], [], [], []
     deltas = Counter()
     for order, entries, payment, shipment, flows in batch:
@@ -137,14 +159,14 @@ def write_orders(cursor, batch):
         ledger.extend(flows)
         for product_id, _, _, delta, _ in flows:
             deltas[product_id] += delta
-    insert(cursor, "orders", "id,user_id,merchant_id,status,total,ship_to,created_at,cancelled_at,completed_at", orders)
-    insert(cursor, "order_items", "order_id,product_id,product_name,unit_price,quantity", items)
-    insert(cursor, "payments", "order_id,amount,paid_at", payments)
-    insert(cursor, "shipments", "order_id,tracking_no,status,shipped_at,delivered_at", shipments)
-    insert(cursor, "inventory_records", "product_id,order_id,reason,delta,created_at", ledger)
+    load_rows(cursor, folder, "orders", "id,user_id,merchant_id,status,total,ship_to,created_at,cancelled_at,completed_at", orders)
+    load_rows(cursor, folder, "order_items", "order_id,product_id,product_name,unit_price,quantity", items)
+    load_rows(cursor, folder, "payments", "order_id,amount,paid_at", payments)
+    load_rows(cursor, folder, "shipments", "order_id,tracking_no,status,shipped_at,delivered_at", shipments)
+    load_rows(cursor, folder, "inventory_records", "product_id,order_id,reason,delta,created_at", ledger)
     # 每批对库存做一次集合更新，流水与库存仍处于同一事务。
     updated = [(product, delta) for product, delta in deltas.items() if delta]
-    insert(cursor, "seed_stock_delta", "product_id,delta", updated)
+    load_rows(cursor, folder, "seed_stock_delta", "product_id,delta", updated)
     cursor.execute("UPDATE inventory i JOIN seed_stock_delta d USING (product_id) SET i.available=i.available+d.delta")
     cursor.execute("DELETE FROM seed_stock_delta")
 
@@ -160,9 +182,10 @@ def main():
     print(f"synthetic=true mode={args.mode} seed={SEED} start_utc={datetime.now(timezone.utc).isoformat()}", flush=True)
     conn = pymysql.connect(host="127.0.0.1", port=int(os.environ["MYSQL_PRIMARY_PORT"]),
                            user="of_app", password=os.environ["DB_APP_PASSWORD"],
-                           database="orderflow", charset="utf8mb4", autocommit=False)
+                           database="orderflow", charset="utf8mb4", autocommit=False, local_infile=True)
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor() as cursor, TemporaryDirectory(prefix="orderflow-seed-") as staging:
+            folder = Path(staging)
             cursor.execute("SELECT GET_LOCK('orderflow_seed',0)")
             if cursor.fetchone()[0] != 1:
                 raise RuntimeError("另一个种子导入正在执行")
@@ -177,8 +200,8 @@ def main():
             if actual_users != spec[0] or cursor.fetchone()[0] != spec[0] - FIXTURE_USERS:
                 raise RuntimeError("数据库已有其他种子模式。请使用新的数据卷或新环境。")
             cursor.execute("SELECT COUNT(*),COALESCE(MAX(id),0) FROM orders WHERE id<=%s AND created_at<'2026-11-25'", (spec[-1],))
-            count, completed = cursor.fetchone()
-            if count != completed or completed == 0 and count != 0:
+            count, completed = map(int, cursor.fetchone())
+            if count != completed:
                 raise RuntimeError("历史订单不连续，禁止自动续跑")
             if completed == spec[-1]:
                 print(f"historical data already present orders={completed}", flush=True)
@@ -190,10 +213,10 @@ def main():
             batches = iter(islice(generate_orders(spec, by_shop, rng), completed, None))
             print(f"generating and importing order batches from={completed+1} target={spec[-1]}", flush=True)
             while batch := list(islice(batches, 4000)):
-                write_orders(cursor, batch)
+                write_orders(cursor, batch, folder)
                 conn.commit()
                 completed = batch[-1][0][0]
-                if completed % 20000 == 0 or completed == spec[-1]:
+                if completed % 20000 == 0 or completed == spec[-1] or args.mode == "small":
                     print(f"committed orders={completed} elapsed_s={time.monotonic()-begin:.2f}", flush=True)
     except Exception:
         conn.rollback()

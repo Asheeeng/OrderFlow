@@ -38,3 +38,7 @@ redis-data/
 .idea/
 .vscode/
 *.iml
+
+*.tsv
+*.backup.sql
+dump-*.sql

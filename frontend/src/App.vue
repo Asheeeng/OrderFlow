@@ -445,6 +445,7 @@ const roleName = (role?: Role) => role ? roles[role] : ''
         <div class="dialog-actions"><b class="price">合计 {{ currency(chosen.total) }}</b>
           <template v-if="actor.role==='CUSTOMER' && chosen.status==='PENDING'"><el-button :disabled="busy" @click="transition('cancel')">取消订单</el-button>
             <el-button type="primary" :loading="busy" @click="transition('pay')">模拟支付</el-button></template>
+          <el-button v-if="actor.role==='ADMIN' && chosen.status==='PENDING'" :disabled="busy" @click="transition('cancel')">取消待支付订单</el-button>
           <el-button v-if="actor.role==='CUSTOMER' && chosen.status==='SHIPPED'" type="primary" :loading="busy" @click="transition('receive')">确认收货</el-button>
           <template v-if="actor.role==='MERCHANT' && chosen.status==='PAID'">
             <el-input v-model="tracking" aria-label="物流单号" placeholder="输入模拟物流单号" maxlength="48" />

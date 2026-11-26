@@ -115,7 +115,8 @@ class OrderController {
 
     @PostMapping("/orders/{id}/cancel")
     void cancel(HttpServletRequest request, @PathVariable @Positive long id) {
-        long user = auth.require(request, "CUSTOMER").id();
+        Actor actor = auth.require(request, "CUSTOMER", "ADMIN");
+        Long user = actor.role().equals("ADMIN") ? null : actor.id();
         retryDeadlock(() -> { orders.cancel(id, user); return null; });
     }
 

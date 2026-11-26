@@ -92,8 +92,10 @@ class OrderService {
     }
 
     @Transactional(isolation=Isolation.READ_COMMITTED)
-    public void cancel(long id, long user) {
-        Map<String, Object> order = locked(id, "user_id", user);
+    public void cancel(long id, Long user) {
+        Map<String, Object> order = user == null
+                ? Db.one(db, "SELECT status,total FROM orders WHERE id=? FOR UPDATE", "订单", id)
+                : locked(id, "user_id", user);
         expect(order, "PENDING");
         List<Map<String, Object>> items = db.queryForList(
                 "SELECT product_id,quantity FROM order_items WHERE order_id=? ORDER BY product_id", id);
