@@ -1,0 +1,29 @@
+UTC 2026-11-26T12:22:43Z
+PASS: 详情已缓存，实测 TTL 为 90 秒（上限 90）。
+ Container orderflow-redis-1 Stopping 
+ Container orderflow-redis-1 Stopped 
+PASS: Redis 容器停止后商品详情仍为 HTTP 200，业务字段与在线读取一致。
+ Container orderflow-redis-1 Starting 
+ Container orderflow-redis-1 Started 
+ Container orderflow-redis-1 Waiting 
+ Container orderflow-redis-1 Healthy 
+PASS: Redis AOF 在停止再启动后保留验收标记。
+ Container orderflow-redis-1 Stopping 
+ Container orderflow-primary-1 Stopping 
+ Container orderflow-replica-1 Stopping 
+ Container orderflow-redis-1 Stopped 
+ Container orderflow-replica-1 Stopped 
+ Container orderflow-primary-1 Stopped 
+ Container orderflow-redis-1 Starting 
+ Container orderflow-primary-1 Starting 
+ Container orderflow-replica-1 Starting 
+ Container orderflow-redis-1 Started 
+ Container orderflow-replica-1 Started 
+ Container orderflow-primary-1 Started 
+ Container orderflow-primary-1 Waiting 
+ Container orderflow-replica-1 Waiting 
+ Container orderflow-redis-1 Waiting 
+ Container orderflow-replica-1 Healthy 
+ Container orderflow-redis-1 Healthy 
+ Container orderflow-primary-1 Healthy 
+PASS: Compose 三服务停启后，订单 400002 主从一致，从库只读和前端代理查询恢复。

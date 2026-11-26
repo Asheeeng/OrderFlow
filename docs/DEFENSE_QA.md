@@ -266,7 +266,7 @@
 
 **可能追问**　外键默认 RESTRICT 对历史订单有什么好处？
 
-**复现方法**　执行外键 1452 验收并查看 information_schema.KEY_COLUMN_USAGE。
+**复现方法**　执行外键拒绝验证（错误 1216 或 1452）并查看 information_schema.KEY_COLUMN_USAGE。
 
 ## 20. 范式与反范式如何取舍？你的表设计中是否有反范式？
 

@@ -1,0 +1,54 @@
+UTC 2026-11-26T12:09:23Z — isolated containers, network=none, image=mysql:8.0.44
+8.0.44	1	ROW	ON
+备份位点 lab-bin.000003:10943
+误删后源实例（应只有订单 2）
++----+---------+-------+--------------------+----------+
+| id | status  | total | product_name       | quantity |
++----+---------+-------+--------------------+----------+
+|  2 | PENDING | 39.80 | 合成恢复商品       |        2 |
++----+---------+-------+--------------------+----------+
++------------+-----------+
+| product_id | available |
++------------+-----------+
+|          1 |         8 |
++------------+-----------+
+mysqlbinlog  Ver 8.4.11 for macos15.7 on arm64 (Homebrew)
+mysqlbinlog --base64-output=DECODE-ROWS -vv --start-position=11762 /var/lib/mysql/lab-bin.000003
+# at 197
+# at 11762
+#261126 20:10:35 server id 91  end_log_pos 11841 CRC32 0x701cbc48 	GTID	last_committed=23	sequence_number=24	rbr_only=yes	original_committed_timestamp=1795695035725591	immediate_commit_timestamp=1795695035725591	transaction_length=809
+SET @@SESSION.GTID_NEXT= '4607feba-e992-11f1-ab7b-c20cf3a04785:29'/*!*/;
+# at 11841
+# at 11921
+# at 11997
+### DELETE FROM `orderflow`.`inventory_records`
+###   @1=1 /* LONGINT meta=0 nullable=0 is_null=0 */
+# at 12067
+# at 12143
+### DELETE FROM `orderflow`.`order_items`
+###   @1=1 /* LONGINT meta=0 nullable=0 is_null=0 */
+# at 12233
+# at 12313
+### DELETE FROM `orderflow`.`orders`
+###   @1=1 /* LONGINT meta=0 nullable=0 is_null=0 */
+# at 12408
+# at 12470
+###   @1=1 /* LONGINT meta=0 nullable=0 is_null=0 */
+###   @1=1 /* LONGINT meta=0 nullable=0 is_null=0 */
+# at 12540
+COMMIT/*!*/;
+SET @@SESSION.GTID_NEXT= 'AUTOMATIC' /* added by mysqlbinlog */ /*!*/;
+在第二台实例恢复备份并重放 mysqlbinlog --start-position=10943 --stop-position=11762 --skip-gtids
+恢复实例验证（备份中的订单 1 和之后正常新增的订单 2）
++----+---------+-------+--------------------+----------+
+| id | status  | total | product_name       | quantity |
++----+---------+-------+--------------------+----------+
+|  1 | PENDING | 19.90 | 合成恢复商品       |        1 |
+|  2 | PENDING | 39.80 | 合成恢复商品       |        2 |
++----+---------+-------+--------------------+----------+
++------------+-----------+
+| product_id | available |
++------------+-----------+
+|          1 |         7 |
++------------+-----------+
+PASS: 恢复两笔订单和对应明细，没有重放误删事务。

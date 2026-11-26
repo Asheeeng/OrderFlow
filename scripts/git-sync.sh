@@ -47,6 +47,8 @@ fi
 for name in "${remote_names[@]}"; do
   url="$(git remote get-url --push "$name")"
   refs="$(git ls-remote --refs "$url" refs/heads/main 'refs/tags/*')" || fail "$name 同步核验失败。"
+  target="$(git ls-remote --symref "$url" HEAD | awk '$1=="ref:" && $3=="HEAD" {print $2}')"
+  [[ "$target" == refs/heads/main ]] || fail "$name 远程默认分支不是 main。"
   [[ "$(awk '$2=="refs/heads/main" {print $1}' <<<"$refs")" == "$expected_main" ]] || fail "$name/main 尚未与本地同步。"
   [[ "$(awk '$2 ~ /^refs\/tags\// {print $0}' <<<"$refs" | LC_ALL=C sort)" == "$local_tags" ]] || fail "$name 的版本标签尚未与本地同步。"
 done

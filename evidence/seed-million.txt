@@ -1,0 +1,20 @@
+synthetic=true mode=million seed=20261126 start_utc=2026-11-26T12:04:02.906576+00:00
+generating and importing order batches from=52001 target=400000
+committed orders=60000 elapsed_s=66.73
+committed orders=80000 elapsed_s=124.76
+committed orders=100000 elapsed_s=149.82
+committed orders=120000 elapsed_s=181.70
+committed orders=140000 elapsed_s=370.55
+committed orders=160000 elapsed_s=382.34
+committed orders=180000 elapsed_s=390.18
+committed orders=200000 elapsed_s=395.86
+committed orders=220000 elapsed_s=400.34
+committed orders=240000 elapsed_s=404.45
+committed orders=260000 elapsed_s=408.72
+committed orders=280000 elapsed_s=413.74
+committed orders=300000 elapsed_s=418.40
+committed orders=320000 elapsed_s=422.94
+committed orders=340000 elapsed_s=426.68
+committed orders=360000 elapsed_s=430.73
+committed orders=380000 elapsed_s=435.68
+committed orders=400000 elapsed_s=440.98

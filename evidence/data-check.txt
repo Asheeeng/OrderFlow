@@ -1,0 +1,29 @@
+UTC 2026-11-26T12:23:42Z
+8.0.44	ON	ROW	71
+主从精确行数一致
+table_name	row_count
+users	30014
+merchants	1000
+categories	100
+products	20005
+inventory	20005
+addresses	40014
+cart_items	30005
+orders	400007
+order_items	1000007
+payments	299976
+shipments	252251
+inventory_records	1119621
+product_price_history	3
+total_rows	3213008
+主从完整性查询结果一致
+check_name	bad
+order_total_or_empty	0
+cross_merchant	0
+product_without_inventory	0
+invalid_owner_role	0
+payment_state_amount_time	0
+shipment_state_time	0
+inventory_balance	0
+missing_or_wrong_order_ledger	0
+unexpected_order_ledger	0

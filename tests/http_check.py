@@ -81,18 +81,20 @@ def constraints(product, order):
     try:
         with conn.cursor() as cursor:
             statements = [
-                (1452, "INSERT INTO addresses(user_id,recipient,destination) VALUES (9000000000,'x','x')", ()),
-                (3819, "UPDATE inventory SET available=-1 WHERE product_id=%s", (product,)),
-                (1062, "INSERT INTO payments(order_id,amount) VALUES(%s,12.35)", (order,)),
-                (1048, "UPDATE orders SET ship_to=NULL WHERE id=%s", (order,)),
+                ((1216, 1452), "INSERT INTO addresses(user_id,recipient,destination) VALUES (9000000000,'x','x')", ()),
+                ((3819,), "UPDATE inventory SET available=-1 WHERE product_id=%s", (product,)),
+                ((1062,), "INSERT INTO payments(order_id,amount) VALUES(%s,12.35)", (order,)),
+                ((1048,), "UPDATE orders SET ship_to=NULL WHERE id=%s", (order,)),
             ]
-            for code, sql, args in statements:
+            actual = []
+            for codes, sql, args in statements:
                 try:
                     cursor.execute(sql, args)
-                    raise AssertionError(f"数据库应拒绝 {code}")
+                    raise AssertionError(f"数据库应拒绝 {codes}")
                 except pymysql.MySQLError as error:
-                    assert error.args[0] == code, (code, error)
-            passed("外键 1452、CHECK 3819、唯一键 1062、NOT NULL 1048")
+                    assert error.args[0] in codes, (codes, error)
+                    actual.append(error.args[0])
+            passed(f"外键 {actual[0]}、CHECK {actual[1]}、唯一键 {actual[2]}、NOT NULL {actual[3]}")
     finally:
         conn.rollback()
         conn.close()

@@ -1,0 +1,6 @@
+2026-11-26T12:22:41.348558+00:00 synthetic=true
+PASS — REPEATABLE READ 两次普通读：'验收商品' → '验收商品'
+PASS — READ COMMITTED 两次普通读：'验收商品' → '合成 MVCC 新版本'
+PASS — 主键等值行锁令同一行上的第二会话返回 1205
+PASS — REPEATABLE READ 范围锁住末端间隙，插入返回 1205
+PASS — 逆序申请两个库存锁产生真实死锁，结果 0 / 1213，两会话均回滚

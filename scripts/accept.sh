@@ -9,6 +9,7 @@ scripts/binlog-lab.sh --isolated-run
 scripts/runtime-check.sh
 scripts/replication-lab.sh
 scripts/check-data.sh --million
+scripts/inspect-db.sh
 scripts/test-browser.sh
 tests/git_sync_check.sh
 echo '自动化验收通过。Navicat 实机及远程版本由对应检查步骤记录。'

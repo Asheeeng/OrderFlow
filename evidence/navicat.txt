@@ -1,0 +1,102 @@
+UTC 2026-11-26T12:24:11Z
+Navicat Premium 实机观察：OrderFlow 主库、从库均为 OV MySQL On，且均显示 orderflow。两份连接配置未保存密码。
+验证 127.0.0.1:13316 / of_inspect / orderflow
++-----------+-----------+-----------------+--------+
+| server_id | read_only | super_read_only | mysql  |
++-----------+-----------+-----------------+--------+
+|        71 |         0 |               0 | 8.0.44 |
++-----------+-----------+-----------------+--------+
++-----------------+
+| order_item_rows |
++-----------------+
+|         1000007 |
++-----------------+
++--------------------+-----------------------+
+| CONSTRAINT_NAME    | REFERENCED_TABLE_NAME |
++--------------------+-----------------------+
+| order_items_ibfk_1 | orders                |
+| order_items_ibfk_2 | products              |
++--------------------+-----------------------+
++--------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table  | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++--------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| orders |          0 | PRIMARY                     |            1 | id          | A         |      389392 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_status_date |            1 | user_id     | A         |       28882 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_status_date |            2 | status      | A         |      114004 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_status_date |            3 | created_at  | A         |      397392 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_status_date |            4 | id          | A         |      397392 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_list        |            1 | user_id     | A         |       26298 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_list        |            2 | id          | A         |      386830 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_merchant_list    |            1 | merchant_id | A         |        1076 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_merchant_list    |            2 | id          | A         |      377845 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_status_date      |            1 | status      | A         |           4 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_status_date      |            2 | created_at  | A         |      382968 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_status_date      |            3 | id          | A         |      392437 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_date             |            1 | created_at  | A         |      397392 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_date             |            2 | id          | A         |      376373 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
++--------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
++---------------------+--------------------+--------------------+---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| TRIGGER_NAME        | EVENT_MANIPULATION | EVENT_OBJECT_TABLE | ACTION_TIMING | ACTION_STATEMENT                                                                                                                                               |
++---------------------+--------------------+--------------------+---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| product_price_audit | UPDATE             | products           | AFTER         | BEGIN
+  IF OLD.price <> NEW.price THEN
+    INSERT INTO product_price_history(product_id,old_price,new_price) VALUES(OLD.id,OLD.price,NEW.price);
+  END IF;
+END |
++---------------------+--------------------+--------------------+---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------+
++------------+--------+---------+
+| day        | orders | sales   |
++------------+--------+---------+
+| 2026-11-14 |      1 | 1067.00 |
++------------+--------+---------+
+PASS: SQL 查询成功、尝试 UPDATE 被拒绝 1142。
+验证 127.0.0.1:13307 / of_inspect / orderflow
++-----------+-----------+-----------------+--------+
+| server_id | read_only | super_read_only | mysql  |
++-----------+-----------+-----------------+--------+
+|        72 |         1 |               1 | 8.0.44 |
++-----------+-----------+-----------------+--------+
++-----------------+
+| order_item_rows |
++-----------------+
+|         1000007 |
++-----------------+
++--------------------+-----------------------+
+| CONSTRAINT_NAME    | REFERENCED_TABLE_NAME |
++--------------------+-----------------------+
+| order_items_ibfk_1 | orders                |
+| order_items_ibfk_2 | products              |
++--------------------+-----------------------+
++--------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table  | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++--------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| orders |          0 | PRIMARY                     |            1 | id          | A         |      389392 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_status_date |            1 | user_id     | A         |       30306 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_status_date |            2 | status      | A         |      113135 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_status_date |            3 | created_at  | A         |      389392 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_status_date |            4 | id          | A         |      384563 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_list        |            1 | user_id     | A         |       29189 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_user_list        |            2 | id          | A         |      377336 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_merchant_list    |            1 | merchant_id | A         |         911 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_merchant_list    |            2 | id          | A         |      389392 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_status_date      |            1 | status      | A         |           4 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_status_date      |            2 | created_at  | A         |      385070 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_status_date      |            3 | id          | A         |      387878 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_date             |            1 | created_at  | A         |      389392 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| orders |          1 | idx_orders_date             |            2 | id          | A         |      389392 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
++--------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
++---------------------+--------------------+--------------------+---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| TRIGGER_NAME        | EVENT_MANIPULATION | EVENT_OBJECT_TABLE | ACTION_TIMING | ACTION_STATEMENT                                                                                                                                               |
++---------------------+--------------------+--------------------+---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| product_price_audit | UPDATE             | products           | AFTER         | BEGIN
+  IF OLD.price <> NEW.price THEN
+    INSERT INTO product_price_history(product_id,old_price,new_price) VALUES(OLD.id,OLD.price,NEW.price);
+  END IF;
+END |
++---------------------+--------------------+--------------------+---------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------+
++------------+--------+---------+
+| day        | orders | sales   |
++------------+--------+---------+
+| 2026-11-14 |      1 | 1067.00 |
++------------+--------+---------+
+PASS: SQL 查询成功、尝试 UPDATE 被拒绝 1290。

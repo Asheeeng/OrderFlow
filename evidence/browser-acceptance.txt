@@ -1,0 +1,17 @@
+(node:5415) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:5423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+(node:5423) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+(node:5423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/3] tests/orderflow.spec.ts:12:1 › 顾客使用实际目录、分类搜索、详情与购物车
+[2/3] tests/orderflow.spec.ts:32:1 › 商家页面使用从库统计并可查看商品和库存
+[3/3] tests/orderflow.spec.ts:41:1 › 管理员查看实时图表、数据库记录和真实实验截图
+  3 passed (14.1s)

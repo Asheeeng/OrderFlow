@@ -1,0 +1,31 @@
+synthetic=true mode=small seed=20261126 start_utc=2026-11-26T12:25:18.446605+00:00
+reference data committed users=120 products=160
+generating and importing order batches from=1 target=400
+committed orders=400 elapsed_s=0.37
+synthetic=true mode=small seed=20261126 start_utc=2026-11-26T12:25:18.934459+00:00
+historical data already present orders=400
+table_name	row_count
+users	120
+merchants	8
+categories	16
+products	160
+inventory	160
+addresses	150
+cart_items	100
+orders	400
+order_items	1000
+payments	300
+shipments	253
+inventory_records	1121
+product_price_history	1
+check_name	bad
+order_total_or_empty	0
+cross_merchant	0
+product_without_inventory	0
+invalid_owner_role	0
+payment_state_amount_time	0
+shipment_state_time	0
+inventory_balance	0
+missing_or_wrong_order_ledger	0
+unexpected_order_ledger	0
+PASS: 全新隔离库 small 生成、重复运行、1,000 行订单明细及完整性。
