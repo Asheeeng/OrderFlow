@@ -9,8 +9,11 @@ env_file="${ORDERFLOW_ENV_FILE:-.env.docker}"
 die() { printf '%s\n' "$*" >&2; exit 1; }
 [[ "$project" =~ ^[a-z0-9][a-z0-9_-]*$ && "$project" != orderflow ]] ||
   die 'Use a distinct Compose project name. orderflow is reserved for the host deployment.'
-[[ "${env_file##*/}" != .env ]] ||
-  die 'The host .env is reserved. Use .env.docker or a different Docker environment file.'
+case "${env_file##*/}" in
+  .env.docker.example) die 'The example file is reserved. Use .env.docker or .env.docker.<instance>.' ;;
+  .env.docker|.env.docker.*) ;;
+  *) die 'Use .env.docker or .env.docker.<instance>. The host .env is reserved.' ;;
+esac
 
 setting() {
   [[ -f "$env_file" ]] || die "No $env_file. Run scripts/docker.sh prepare or start."

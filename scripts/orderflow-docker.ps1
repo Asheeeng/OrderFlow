@@ -22,8 +22,9 @@ function Get-OrderFlowDeployment {
         $EnvFile = Join-Path $script:OrderFlowRoot $EnvFile
     }
     $EnvFile = [IO.Path]::GetFullPath($EnvFile)
-    if ([IO.Path]::GetFileName($EnvFile) -eq '.env') {
-        throw 'The host .env is reserved. Use .env.docker or a different Docker environment file.'
+    $filename = [IO.Path]::GetFileName($EnvFile)
+    if ($filename -cnotmatch '^\.env\.docker(?:\..+)?$' -or $filename -eq '.env.docker.example') {
+        throw 'Use .env.docker or .env.docker.<instance>. The host and example files are reserved.'
     }
     [pscustomobject]@{
         Project = $ProjectName

@@ -37,7 +37,7 @@ notepad .env.docker.small
 .\status.ps1 -ProjectName orderflow-docker-small -EnvFile .env.docker.small
 ```
 
-对该实例查看密码、日志或停止时，使用相同的项目名和环境文件。不同实例各自拥有独立的 MySQL、Redis 与 socket 命名卷。
+对该实例查看密码、日志或停止时，使用相同的项目名和环境文件。其他实例的文件名使用 `.env.docker.<实例名>`，使其继续受 Git 忽略规则保护。不同实例各自拥有独立的 MySQL、Redis 与 socket 命名卷。
 
 ## 密码、数据模式及重启
 

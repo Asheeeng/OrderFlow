@@ -16,7 +16,7 @@ compose() (
 db() {
   local service="$1"
   shift
-  compose exec -T "$service" sh -c 'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; exec mysql -uroot --default-character-set=utf8mb4 "$@"' sh "$@"
+  compose exec -T "$service" sh -c 'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; exec mysql -uroot --socket=/run/orderflow/mysql.sock --default-character-set=utf8mb4 "$@"' sh "$@"
 }
 redis() {
   compose exec -T redis sh -c 'export REDISCLI_AUTH="$REDIS_PASSWORD"; exec redis-cli "$@"' sh "$@"
@@ -64,6 +64,14 @@ grep -q 'historical data already present' <<< "$init_log"
 grep -q "READY: mode=$mode" <<< "$init_log"
 [[ "$(counts primary)" == "$before" ]]
 echo 'PASS: a second initialization preserved every business-table row count.'
+
+if wrong_mode="$(compose run --rm --no-deps -T -e SEED_MODE=small init 2>&1)"; then
+  echo 'A different seed mode should have been rejected.' >&2
+  exit 1
+fi
+grep -q '数据库已有其他种子模式' <<< "$wrong_mode"
+[[ "$(counts primary)" == "$before" ]]
+echo 'PASS: wrong seed mode was rejected without modifying business data.'
 
 compose run --rm --no-deps -T -e OF_TEST_API_BASE=http://frontend/api \
   -e OF_API_FIXTURE_FILE=/tmp/orderflow-test.json --entrypoint python init - < tests/http_check.py
