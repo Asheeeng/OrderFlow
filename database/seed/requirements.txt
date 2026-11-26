@@ -1,0 +1,5 @@
+Faker==37.5.3
+PyMySQL==1.1.2
+bcrypt==4.3.0
+cryptography==45.0.7
+tzdata==2026.6
