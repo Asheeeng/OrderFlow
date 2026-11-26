@@ -7,7 +7,7 @@ x-mysql: &mysql
     MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Generate a Docker environment file first}
     MYSQL_ROOT_HOST: localhost
   healthcheck:
-    test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysql -h 127.0.0.1 --protocol=TCP -uroot -Nse 'SELECT 1'"]
+    test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysql --socket=/run/orderflow/mysql.sock -uroot -Nse 'SELECT @@port' | grep -qx 3306"]
     interval: 5s
     timeout: 4s
     start_period: 30s

@@ -4,7 +4,7 @@
 
 ## 容器启动顺序
 
-1. `primary`、`replica` 和 `redis` 启动。MySQL 健康检查通过 TCP 验证正式实例可查询，Redis 检查认证后的 PING。
+1. `primary`、`replica` 和 `redis` 启动。MySQL 健康检查通过管理 socket 验证已进入开放 3306 的正式实例，Redis 检查认证后的 PING。
 2. 一次性 `init` 服务等待主从健康，建立库、索引、过程、触发器及账号，配置 GTID 自动定位与从库只读，再导入指定种子。关系数据分批提交，重复执行复用已有合成数据，部分导入从已提交进度续跑。
 3. `backend` 等待 `init` 正常退出，同时检查三项依赖健康。它通过 Compose 服务名访问 `primary:3306`、`replica:3306` 和 `redis:6379`。
 4. `frontend` 在后端健康后启动。Nginx 在同源地址提供 Vue，并将 `/api/` 转发至 `backend:8080`。它的健康检查走过 Nginx、Spring Boot 和主库。
