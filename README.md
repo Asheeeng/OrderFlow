@@ -2,7 +2,18 @@
 
 OrderFlow 是一个本地电商订单与库存系统，覆盖顾客购买、商家履约和管理员运营。MySQL 主库保存业务写入，只读从库提供历史统计，Redis 缓存商品展示字段。历史业务数据和所有验收账户均为合成数据。
 
-## 启动与验收
+## V1.0.1 全 Docker 快速启动
+
+部署只需要 **Docker Desktop 和 Git**。默认导入百万级合成数据。首次构建与导入完成后，打开 [OrderFlow](http://127.0.0.1:5173/)。
+
+| 系统 | 启动 | 停止 | 查看状态 |
+|---|---|---|---|
+| Windows PowerShell | `.\start.ps1` | `.\stop.ps1` | `.\status.ps1` |
+| macOS | `./scripts/docker.sh start` | `./scripts/docker.sh stop` | `./scripts/docker.sh status` |
+
+三类演示密码及 Navicat 连接方式见 [快速开始](docs/QUICK_START.md)。从零安装请参阅 [Windows](docs/DEPLOY_WINDOWS.md) 或 [macOS](docs/DEPLOY_MACOS.md)，部署结构和已有实例共存方式见 [Docker 部署](docs/DEPLOY_DOCKER.md)。全 Docker 使用独立项目和 `.env.docker`。默认沿用原 Navicat 端口，与宿主机版并行时需要为新项目选空闲端口。平台验收及实际日志见 [V1.0.1 验收记录](evidence/v1.0.1/README.md)。
+
+## 宿主机版启动与验收
 
 环境需要 Docker Desktop 或 Docker Engine + Compose v2、Java 17、Maven 3.9、Node.js 22 及 npm、Python 3.11 以上和 OpenSSL。恢复实验另需 MySQL 官方客户端的 `mysqlbinlog`。浏览器测试默认使用本机 Google Chrome，也可通过 `OF_BROWSER_CHANNEL` 指定已安装的浏览器通道。
 
