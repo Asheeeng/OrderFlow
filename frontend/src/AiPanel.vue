@@ -104,7 +104,9 @@ function analyse() {void handle(async()=>{inventory.value=await api('/ai/invento
           <p>{{ entry.reply.validationReason }}</p>
           <details><summary>模型原始回答</summary><pre>{{ entry.reply.modelDraft }}</pre></details>
         </details>
-        <details v-for="(tool,index) in entry.reply?.tools" :key="index" open class="ai-detail">
+        <template v-for="(tool,index) in entry.reply?.tools" :key="index">
+          <AiChart v-if="tool.chart && tool.rows.length" :type="tool.chart" :rows="tool.rows" :label-field="tool.labelField" :value-field="tool.valueField"/>
+          <details class="ai-detail">
           <summary>{{ toolNames[tool.name] }} · {{ tool.source }} · {{ tool.elapsedMs }} ms</summary>
           <p>{{ tool.definition }}</p>
           <dl><dt>参数</dt><dd><code>{{ JSON.stringify(tool.arguments) }}</code></dd></dl>
@@ -114,8 +116,8 @@ function analyse() {void handle(async()=>{inventory.value=await api('/ai/invento
             <tbody><tr v-for="(row,n) in tool.rows" :key="n"><td v-for="key in columnNames(tool.rows)" :key="key">{{ cell(key,row[key]) }}</td></tr></tbody>
           </table></div>
           <p v-else>该范围没有记录。</p>
-          <AiChart v-if="tool.chart && tool.rows.length" :type="tool.chart" :rows="tool.rows" :label-field="tool.labelField" :value-field="tool.valueField"/>
-        </details>
+          </details>
+        </template>
         <details v-for="source in entry.reply?.references" :key="source.id" class="ai-detail">
           <summary>引用 #{{ source.id }} · {{ source.document }} / {{ source.title }} · {{ source.similarity.toFixed(3) }}</summary>
           <p>{{ source.excerpt }}</p>

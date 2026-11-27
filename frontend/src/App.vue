@@ -273,6 +273,7 @@ function readLog(name:string) {
   })
 }
 function setAddressForm() { recipient.value='';destination.value='';dialog.value='address' }
+const productImage = (row?: Row) => `/images/cat${((row?.category_id ?? 1) - 1) % 8 + 1}.svg`
 const roleName = (role?: Role) => role ? roles[role] : ''
 </script>
 
@@ -298,20 +299,28 @@ const roleName = (role?: Role) => role ? roles[role] : ''
     </div>
   </main>
   <div v-else class="app-layout">
-    <aside class="sidebar">
-      <div class="brand"><span class="brand-mark"><Box /></span><div><strong>OrderFlow</strong><small>订单与库存</small></div></div>
-      <nav aria-label="角色菜单">
-        <button v-for="[key,label,Icon] in menu" :key="key" :class="{selected:view===key}"
-          :aria-current="view===key?'page':undefined" @click="choose(key)">
+    <header class="top-nav">
+      <div class="top-row">
+        <div class="brand"><span class="brand-mark"><Box /></span><div><strong>OrderFlow</strong><small>订单与库存</small></div></div>
+        <form v-if="view==='catalog'" class="top-search" @submit.prevent="search">
+          <el-input v-model="query" :prefix-icon="Search" aria-label="商品名称" placeholder="输入商品名称前缀" clearable />
+          <el-button native-type="submit" type="primary">搜索</el-button>
+        </form>
+        <nav class="top-actions" aria-label="账户操作">
+          <button v-if="actor.role==='CUSTOMER'" type="button" class="icon-entry" :class="{hot:view==='cart'}" @click="choose('cart')"><ShoppingCart /><span>购物车</span></button>
+          <button v-if="actor.role==='CUSTOMER'" type="button" class="icon-entry" :class="{hot:view==='orders'}" @click="choose('orders')"><Tickets /><span>我的订单</span></button>
+          <span class="icon-entry profile"><span class="avatar">{{ actor.name.slice(0,1) }}</span><span class="who"><b>{{ actor.name }}</b><small>{{ roles[actor.role] }}</small></span></span>
+          <button type="button" class="icon-entry" @click="logout"><SwitchButton /><span>退出</span></button>
+        </nav>
+      </div>
+      <nav class="menu-bar" aria-label="角色菜单">
+        <button v-for="[key,label,Icon] in menu" :key="key" :class="{selected:view===key}" :aria-current="view===key?'page':undefined" @click="choose(key)">
           <component :is="Icon" /><span>{{ label }}</span>
         </button>
+        <span class="menu-trail">OrderFlow <i aria-hidden="true">/</i> {{ title }}</span>
       </nav>
-      <div class="side-footer"><span class="avatar">{{ actor.name.slice(0,1) }}</span><div><strong>{{ actor.name }}</strong><small>{{ roles[actor.role] }}</small></div></div>
-    </aside>
+    </header>
     <section class="workspace">
-      <header class="topbar"><div>OrderFlow <span aria-hidden="true">/</span> {{ title }}</div>
-        <button class="text-button" @click="logout"><SwitchButton /> 退出登录</button>
-      </header>
       <main class="main" :aria-busy="loading">
         <div class="page-title"><div><h1>{{ title }}</h1><p>{{ intro[view] }}</p></div>
           <el-button plain :icon="Refresh" :loading="loading" @click="load">刷新</el-button>
@@ -332,7 +341,21 @@ const roleName = (role?: Role) => role ? roles[role] : ''
           </div><Trend :values="analytics.trend" /></section>
         </template>
 
-        <section v-if="view==='catalog' || view==='products'" class="surface">
+        <template v-if="view==='catalog'">
+          <div class="hero-banner"><div><small>ORDERFLOW PICKS</small><h2>把好物拾进日常</h2><p>按分类浏览或搜索关键词，挑选心仪的商品。</p></div><div class="hero-side"><strong>{{ integer(rows.length) }}</strong><span>本页在售商品</span><span>第 {{ previous.length+1 }} 页</span></div></div>
+          <div class="service-strip"><section v-for="[name,description] in [['甄选好物','每件商品真实入库'],['真实库存','下单即时扣减'],['安全支付','事务保证一致性']]" :key="name"><i>{{ name.slice(0,1) }}</i><div><b>{{ name }}</b><span>{{ description }}</span></div></section></div>
+          <section class="surface shop">
+            <div class="cat-bar"><button type="button" :class="{on:!category}" @click="category=undefined;search()">全部好物</button>
+              <button v-for="item in categories" :key="item.id" type="button" :class="{on:category===item.id}" @click="category=item.id;search()">{{ item.name }}</button>
+              <span class="cat-note">第 {{ previous.length+1 }} 页 · {{ integer(rows.length) }} 件</span></div>
+            <div v-if="!rows.length" class="empty">{{ loading?'加载中…':'没有符合条件的商品' }}</div>
+            <div v-else class="product-grid"><button v-for="row in rows" :key="row.id" type="button" class="product-card" @click="showCartItem(row)">
+              <img class="card-thumb" :src="productImage(row)" :alt="row.name" loading="lazy"><span class="card-body"><b>{{ row.name }}</b><small>{{ row.category }} · {{ row.merchant }}</small><span class="card-foot"><span class="price-tag">{{ currency(row.price) }}</span><span class="stock" :class="{out:!row.available}">{{ row.available?'库存 '+row.available:'暂无库存' }}</span></span></span>
+            </button></div>
+          </section>
+        </template>
+
+        <section v-if="view==='products'" class="surface">
           <form class="toolbar" @submit.prevent="search">
             <el-input v-model="query" :prefix-icon="Search" aria-label="商品名称" placeholder="商品名称前缀" clearable />
             <el-select v-model="category" aria-label="分类" clearable placeholder="全部分类" @change="search">
@@ -439,10 +462,10 @@ const roleName = (role?: Role) => role ? roles[role] : ''
       width="min(92vw, 590px)" @close="dialog=''">
       <p v-if="error" class="notice error" role="alert">{{ error }}</p>
       <template v-if="dialog==='buy' && chosen">
-        <h2>{{ chosen.name }}</h2><p>{{ chosen.merchant }} · {{ chosen.category }}</p>
+        <div class="buy-head"><img class="buy-thumb" :src="productImage(chosen)" :alt="chosen.name"><div class="buy-info"><h2>{{ chosen.name }}</h2><p class="meta">{{ chosen.merchant }} · {{ chosen.category }}</p>
         <p class="price"><strong>{{ currency(chosen.price) }}</strong> · 库存 {{ chosen.available }}</p>
         <div class="dialog-actions"><el-input-number v-model="qty" :min="1" :max="999" aria-label="购买数量" />
-          <el-button type="primary" :disabled="!chosen.available" :loading="busy" @click="setCart(chosen.id,qty)">保存到购物车</el-button></div>
+          <el-button type="primary" :disabled="!chosen.available" :loading="busy" @click="setCart(chosen.id,qty)">保存到购物车</el-button></div></div></div>
       </template>
       <template v-if="dialog==='order' && chosen">
         <div class="order-heading"><h2>#{{ chosen.id }}</h2><span class="status" :class="chosen.status?.toLowerCase()">{{ statuses[chosen.status ?? ''] }}</span></div>

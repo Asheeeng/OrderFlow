@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="棉麻靠垫">
+  <defs>
+    <linearGradient id="bg7" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4efe2"/><stop offset="1" stop-color="#e0d6bc"/></linearGradient>
+    <linearGradient id="fabric7" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8c8a8"/><stop offset=".5" stop-color="#c8b494"/><stop offset="1" stop-color="#a89878"/></linearGradient>
+    <radialGradient id="hl7" cx=".3" cy=".3" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg7)"/>
+  <ellipse cx="200" cy="252" rx="120" ry="13" fill="#9a8868" opacity=".35"/>
+  <rect x="110" y="110" width="180" height="130" rx="18" fill="url(#fabric7)"/>
+  <rect x="110" y="110" width="180" height="130" rx="18" fill="url(#hl7)"/>
+  <g stroke="#8a7858" stroke-width="1" opacity=".35" fill="none">
+    <line x1="120" y1="130" x2="280" y2="130"/><line x1="120" y1="150" x2="280" y2="150"/>
+    <line x1="120" y1="170" x2="280" y2="170"/><line x1="120" y1="190" x2="280" y2="190"/>
+    <line x1="120" y1="210" x2="280" y2="210"/><line x1="120" y1="225" x2="280" y2="225"/>
+  </g>
+  <g stroke="#8a7858" stroke-width="1" opacity=".25" fill="none">
+    <line x1="140" y1="120" x2="140" y2="240"/><line x1="170" y1="120" x2="170" y2="240"/>
+    <line x1="200" y1="120" x2="200" y2="240"/><line x1="230" y1="120" x2="230" y2="240"/>
+    <line x1="260" y1="120" x2="260" y2="240"/>
+  </g>
+  <rect x="180" y="160" width="40" height="40" rx="6" fill="none" stroke="#8a7858" stroke-width="1.5" opacity=".5"/>
+  <circle cx="200" cy="180" r="4" fill="#8a7858" opacity=".4"/>
+  <rect x="112" y="112" width="176" height="6" rx="3" fill="#fff" opacity=".3"/>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="护眼书灯">
+  <defs>
+    <linearGradient id="bg6" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5f1e8"/><stop offset="1" stop-color="#e6dec8"/></linearGradient>
+    <linearGradient id="lamp6" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8ecf0"/><stop offset=".5" stop-color="#c0c8ce"/><stop offset="1" stop-color="#8a9298"/></linearGradient>
+    <linearGradient id="shade6" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fef9e8"/><stop offset="1" stop-color="#e8d8a0"/></linearGradient>
+    <radialGradient id="glow6" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff8d0" stop-opacity=".7"/><stop offset="1" stop-color="#fff8d0" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg6)"/>
+  <ellipse cx="200" cy="258" rx="90" ry="10" fill="#a89878" opacity=".35"/>
+  <ellipse cx="200" cy="160" rx="80" ry="50" fill="url(#glow6)"/>
+  <rect x="190" y="120" width="20" height="120" rx="4" fill="url(#lamp6)"/>
+  <path d="M150 100 Q200 70 250 100 L240 130 Q200 110 160 130 Z" fill="url(#shade6)" stroke="#c0a050" stroke-width="1.5"/>
+  <ellipse cx="200" cy="128" rx="40" ry="8" fill="#fff8d0" opacity=".6"/>
+  <rect x="160" y="238" width="80" height="10" rx="3" fill="url(#lamp6)"/>
+  <rect x="180" y="232" width="40" height="8" rx="2" fill="url(#lamp6)"/>
+  <circle cx="200" cy="118" r="6" fill="#fff8d0" opacity=".9"/>
+  <rect x="195" y="140" width="10" height="80" fill="#fff" opacity=".15"/>
+</svg>

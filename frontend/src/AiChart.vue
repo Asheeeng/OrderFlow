@@ -12,7 +12,7 @@ let observer:ResizeObserver
 function draw() {
   const labels=props.rows.map(row=>String(row[props.labelField] ?? ''))
   const values=props.rows.map(row=>Number(row[props.valueField] ?? 0))
-  const colors=['#3568e8','#347f8a','#8db1fd','#7b8cae','#b4c3dd']
+  const colors=['#e0642a','#d4a24a','#b7764c','#87a593','#c7a68a']
   if(props.type==='pie') {
     chart?.setOption({color:colors,tooltip:{trigger:'item'},legend:{bottom:0},
       series:[{type:'pie',radius:['35%','65%'],center:['50%','45%'],data:values.map((value,i)=>({name:labels[i],value}))}]})

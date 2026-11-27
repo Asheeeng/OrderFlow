@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="分隔收纳盒">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6f1e8"/><stop offset="1" stop-color="#e8dfcf"/></linearGradient>
+    <linearGradient id="wood1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9b888"/><stop offset=".5" stop-color="#c79a5e"/><stop offset="1" stop-color="#a87a3e"/></linearGradient>
+    <linearGradient id="lid1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8cda0"/><stop offset="1" stop-color="#c9a872"/></linearGradient>
+    <radialGradient id="hl1" cx=".3" cy=".2" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg1)"/>
+  <ellipse cx="200" cy="252" rx="130" ry="14" fill="#b8a888" opacity=".4"/>
+  <rect x="100" y="132" width="200" height="108" rx="6" fill="url(#wood1)"/>
+  <rect x="100" y="132" width="200" height="108" rx="6" fill="url(#hl1)"/>
+  <line x1="200" y1="132" x2="200" y2="240" stroke="#8a6230" stroke-width="1.5" opacity=".6"/>
+  <rect x="112" y="148" width="76" height="78" rx="4" fill="#f4e4c8" opacity=".9"/>
+  <rect x="212" y="148" width="76" height="78" rx="4" fill="#f4e4c8" opacity=".75"/>
+  <rect x="120" y="158" width="60" height="3" rx="1.5" fill="#c9a872" opacity=".6"/>
+  <rect x="120" y="168" width="44" height="3" rx="1.5" fill="#c9a872" opacity=".5"/>
+  <rect x="220" y="158" width="60" height="3" rx="1.5" fill="#c9a872" opacity=".6"/>
+  <rect x="220" y="168" width="44" height="3" rx="1.5" fill="#c9a872" opacity=".5"/>
+  <rect x="88" y="96" width="224" height="42" rx="8" fill="url(#lid1)"/>
+  <rect x="88" y="96" width="224" height="10" rx="5" fill="#fff7e6" opacity=".7"/>
+  <circle cx="200" cy="117" r="6" fill="#a87a3e" stroke="#8a6230" stroke-width="1.5"/>
+  <rect x="92" y="134" width="216" height="2" fill="#8a6230" opacity=".3"/>
+</svg>

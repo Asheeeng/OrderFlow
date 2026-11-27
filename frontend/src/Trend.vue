@@ -15,16 +15,16 @@ function draw() {
   const days = Array.from({length:30}, (_, index) => new Date(Date.now() - (29-index)*86400000).toISOString().slice(0,10))
   chart?.setOption({
     animationDuration: 450,
-    color: ['#3864e8'],
+    color: ['#e0642a'],
     grid: {left: 12, right: 20, top: 28, bottom: 12, containLabel: true},
     tooltip: {trigger: 'axis', valueFormatter: (value: unknown) => `¥${Number(value).toLocaleString()}`},
     xAxis: {type:'category', boundaryGap:false, data:days.map(day => day.slice(5)),
-      axisLine:{lineStyle:{color:'#dfe6f0'}}, axisLabel:{color:'#61708a', hideOverlap:true}, axisTick:{show:false}},
-    yAxis: {type:'value', axisLabel:{color:'#61708a', formatter: (value: number) => value >= 10000 ? `${value/10000}万` : String(value)},
-      splitLine:{lineStyle:{color:'#e9eef6', type:'dashed'}}},
+      axisLine:{lineStyle:{color:'#eadfd2'}}, axisLabel:{color:'#8a7a6a', hideOverlap:true}, axisTick:{show:false}},
+    yAxis: {type:'value', axisLabel:{color:'#8a7a6a', formatter: (value: number) => value >= 10000 ? `${value/10000}万` : String(value)},
+      splitLine:{lineStyle:{color:'#f0e8db', type:'dashed'}}},
     series: [{name:'销售额', type:'line', symbol:'none', smooth: 0.22, lineStyle:{width:3},
       areaStyle:{color:{type:'linear', x:0, y:0, x2:0, y2:1, colorStops:[
-        {offset:0,color:'rgba(56,100,232,0.20)'},{offset:1,color:'rgba(56,100,232,0.01)'},
+        {offset:0,color:'rgba(224,100,42,0.20)'},{offset:1,color:'rgba(224,100,42,0.01)'},
       ]}}, data:days.map(day => sales.get(day) ?? 0)}],
   })
 }

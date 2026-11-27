@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="编织数据线">
+  <defs>
+    <linearGradient id="bg5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0ede4"/><stop offset="1" stop-color="#ddd4c0"/></linearGradient>
+    <linearGradient id="cord5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a4a3a"/><stop offset=".5" stop-color="#3a2e22"/><stop offset="1" stop-color="#2a2018"/></linearGradient>
+    <linearGradient id="metal5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8ecf0"/><stop offset="1" stop-color="#9aa2a8"/></linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg5)"/>
+  <ellipse cx="200" cy="258" rx="110" ry="11" fill="#a89878" opacity=".3"/>
+  <path d="M90 180 C 130 120, 170 240, 210 160 S 280 120, 320 180" fill="none" stroke="url(#cord5)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M90 180 C 130 120, 170 240, 210 160 S 280 120, 320 180" fill="none" stroke="#7a6a52" stroke-width="2" stroke-dasharray="4 5" opacity=".5"/>
+  <rect x="70" y="172" width="28" height="20" rx="3" fill="url(#metal5)"/>
+  <rect x="60" y="176" width="14" height="12" rx="2" fill="#fff" opacity=".4"/>
+  <rect x="320" y="170" width="36" height="24" rx="4" fill="#2a3640"/>
+  <rect x="348" y="174" width="20" height="16" rx="2" fill="url(#metal5)"/>
+  <rect x="362" y="178" width="10" height="8" rx="1" fill="#fff" opacity=".5"/>
+  <g stroke="#7a6a52" stroke-width="1" opacity=".4">
+    <line x1="110" y1="155" x2="118" y2="148"/><line x1="130" y1="135" x2="138" y2="128"/>
+    <line x1="180" y1="200" x2="188" y2="193"/><line x1="240" y1="155" x2="248" y2="148"/>
+  </g>
+</svg>
