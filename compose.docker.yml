@@ -66,6 +66,7 @@ services:
       replica:
         condition: service_healthy
     volumes:
+      - ai_config_key:/run/orderflow-ai
       - primary_socket:/run/orderflow/primary:ro
       - replica_socket:/run/orderflow/replica:ro
 
@@ -95,6 +96,9 @@ services:
       AI_EMBEDDING_VERSION: ${AI_EMBEDDING_VERSION:-1}
       AI_DAILY_CALL_LIMIT: ${AI_DAILY_CALL_LIMIT:-300}
       AI_USER_MINUTE_LIMIT: ${AI_USER_MINUTE_LIMIT:-20}
+      AI_CONFIG_KEY_FILE: /run/orderflow-ai/master.key
+    volumes:
+      - ai_config_key:/run/orderflow-ai:ro
     depends_on:
       init:
         condition: service_completed_successfully
@@ -133,3 +137,4 @@ volumes:
   redis_data:
   primary_socket:
   replica_socket:
+  ai_config_key:

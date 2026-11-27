@@ -1,0 +1,9 @@
+USE orderflow;
+CREATE TABLE IF NOT EXISTS ai_runtime_config (
+  id TINYINT PRIMARY KEY CHECK (id=1),
+  revision BIGINT NOT NULL,
+  settings JSON NOT NULL,
+  chat_secret VARBINARY(2048),
+  embedding_secret VARBINARY(2048),
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;

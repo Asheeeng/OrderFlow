@@ -3,11 +3,8 @@ package cn.orderflow;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.net.URI;
-import java.net.http.*;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -19,37 +16,47 @@ interface AiModel {
 @Component
 class AiProvider implements AiModel {
     private final AiStore audit;
-    private final Environment env;
-    private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(4))
-            .followRedirects(HttpClient.Redirect.NEVER).build();
+    private final AiConfig config;
 
-    AiProvider(AiStore audit, Environment env) {
-        this.audit = audit;
-        this.env = env;
+    AiProvider(AiStore audit, AiConfig config) {
+        this.audit=audit; this.config=config;
     }
 
-    String setting(String name) { return env.getProperty(name, "").trim(); }
-    String embeddingModel() { return setting("AI_EMBEDDING_MODEL"); }
-    String embeddingSpace() { return AiKnowledge.hash(setting("AI_EMBEDDING_BASE_URL").replaceAll("/+$","") + "|" +
-            embeddingModel() + "|" + env.getProperty("AI_EMBEDDING_VERSION","1")); }
-    boolean chatReady() { return configured("AI_BASE_URL", "AI_API_KEY", "AI_CHAT_MODEL"); }
-    boolean embeddingReady() { return configured("AI_EMBEDDING_BASE_URL", "AI_EMBEDDING_API_KEY", "AI_EMBEDDING_MODEL"); }
-
-    private boolean configured(String base, String key, String model) {
-        return "true".equalsIgnoreCase(setting("AI_ENABLED")) && !setting(base).isBlank()
-                && !setting(key).isBlank() && !setting(model).isBlank() && setting(model).length() <= 160;
+    String embeddingModel() { return config.current().settings().embeddingModel(); }
+    String embeddingSpace() {
+        var snapshot=config.current();
+        var s=snapshot.settings();
+        return AiKnowledge.hash(s.embeddingUrl().replaceAll("/+$","")+"|"+s.embeddingModel()+"|"+s.embeddingVersion()
+                +(snapshot.legacy()?"":"|"+s.dimension()));
+    }
+    int embeddingDimension() { return config.current().settings().dimension(); }
+    boolean chatReady() {
+        var c=config.current(); var s=c.settings();
+        return s.enabled() && !s.chatUrl().isBlank() && !c.chatKey().isBlank() && !s.chatModel().isBlank();
+    }
+    boolean embeddingReady() {
+        var c=config.current(); var s=c.settings();
+        return s.enabled() && !s.embeddingUrl().isBlank() && !c.embeddingSecret().isBlank() && !s.embeddingModel().isBlank();
     }
 
     @Override public JsonNode chat(long user, String operation, List<?> messages, List<?> tools) {
         if (!chatReady()) throw disabled();
         var payload = new LinkedHashMap<String,Object>();
-        payload.put("model", setting("AI_CHAT_MODEL"));
+        payload.put("model", config.current().settings().chatModel());
         payload.put("messages", messages);
-        payload.put("max_tokens", 650);
+        payload.put("max_tokens", config.current().settings().maxTokens());
         payload.put("temperature", 0);
+        URI base=URI.create(config.current().settings().chatUrl());
+        if(base.getHost()!=null && (base.getHost().equals("dashscope.aliyuncs.com") || base.getHost().endsWith(".maas.aliyuncs.com"))) {
+            payload.put("enable_thinking",false);
+        }
+        if (operation.equals("CONFIG_TOOL") && !tools.isEmpty() && messages.stream().noneMatch(
+                message -> message instanceof Map<?,?> item && "tool".equals(item.get("role")))) {
+            payload.put("tool_choice",Map.of("type","function","function",Map.of("name","verify_echo")));
+        }
         if (!tools.isEmpty()) {
             payload.put("tools", tools);
-            payload.put("tool_choice", "auto");
+            payload.putIfAbsent("tool_choice", "auto");
         }
         JsonNode result = send(user, operation, "AI", "chat/completions", payload)
                 .path("choices").path(0).path("message");
@@ -74,39 +81,27 @@ class AiProvider implements AiModel {
     }
 
     private JsonNode send(long user, String operation, String prefix, String path, Map<String,Object> payload) {
-        URI endpoint;
-        try {
-            var base = URI.create(setting(prefix + "_BASE_URL").replaceAll("/+$",""));
-            boolean secure = "https".equalsIgnoreCase(base.getScheme()) ||
-                    ("http".equalsIgnoreCase(base.getScheme()) && "true".equalsIgnoreCase(setting("AI_ALLOW_INSECURE_HTTP")));
-            if (!secure || base.getHost() == null || base.getUserInfo() != null ||
-                    base.getQuery() != null || base.getFragment() != null) throw new IllegalArgumentException();
-            endpoint = URI.create(base + "/" + path);
-        } catch (IllegalArgumentException invalid) {
-            throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "模型地址配置无效");
-        }
-        var request = HttpRequest.newBuilder(endpoint).timeout(Duration.ofSeconds(8))
-                .header("Authorization", "Bearer " + setting(prefix + "_API_KEY"))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(audit.encode(payload))).build();
+        var snapshot=config.current();
+        var settings=snapshot.settings();
+        boolean embedding=prefix.equals("AI_EMBEDDING");
+        String address=(embedding?settings.embeddingUrl():settings.chatUrl()).replaceAll("/+$","");
+        boolean fixture=config.fixture(address) || (snapshot.legacy() && address.equals("http://ai-mock:8765/v1")
+                && "true".equals(config.env("AI_ALLOW_INSECURE_HTTP")));
+        URI endpoint=AiTransport.validatedUri(address,fixture);
+        String key=embedding?snapshot.embeddingSecret():snapshot.chatKey();
         for (int attempt = 0; attempt < 2; attempt++) {
             long id = audit.reserve(user, operation, (String) payload.get("model"));
             long start = System.nanoTime();
             String status = "NETWORK_ERROR";
             JsonNode usage = MissingNode.getInstance();
             try {
-                var pending = http.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-                HttpResponse<String> response;
-                try { response = pending.get(8, TimeUnit.SECONDS); }
-                catch (TimeoutException | InterruptedException deadline) { pending.cancel(true); throw deadline; }
-                status = "HTTP_" + response.statusCode();
-                if ((response.statusCode() == 429 || response.statusCode() == 503) && attempt == 0) {
-                    Thread.sleep(300);
-                    continue;
+                var response=AiTransport.post(endpoint,path,key,audit.encode(payload),settings.timeoutSeconds(),fixture);
+                status="HTTP_"+response.status();
+                if ((response.status()==429 || response.status()==503) && attempt==0) {
+                    Thread.sleep(300); continue;
                 }
-                if (response.statusCode() != 200) {
-                    throw new ApiException(HttpStatus.BAD_GATEWAY, "模型服务调用失败，请稍后再试");
-                }
+                if (response.status()!=200) throw new ApiException(HttpStatus.BAD_GATEWAY,
+                        response.status()==401 || response.status()==403 ? "模型密钥或模型授权无效" : "模型服务拒绝请求或暂不可用");
                 status = "INVALID_REPLY";
                 if (response.body().length() > 512_000) throw invalidReply();
                 JsonNode node = audit.parse(response.body());
@@ -117,12 +112,8 @@ class AiProvider implements AiModel {
             } catch (TimeoutException error) {
                 status = "TIMEOUT";
                 throw new ApiException(HttpStatus.GATEWAY_TIMEOUT, "模型服务响应超时");
-            } catch (ExecutionException error) {
-                if (error.getCause() instanceof HttpTimeoutException) {
-                    status = "TIMEOUT";
-                    throw new ApiException(HttpStatus.GATEWAY_TIMEOUT, "模型服务响应超时");
-                }
-                throw new ApiException(HttpStatus.BAD_GATEWAY, "无法连接模型服务");
+            } catch (java.io.IOException error) {
+                throw new ApiException(HttpStatus.BAD_GATEWAY, "模型连接失败、地址受限或响应超限");
             } catch (IllegalArgumentException error) {
                 throw invalidReply();
             } catch (InterruptedException error) {

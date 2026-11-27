@@ -3,6 +3,7 @@ from contextlib import closing
 import os
 from pathlib import Path
 import re
+import secrets as secure_random
 import subprocess
 import sys
 import time
@@ -153,6 +154,21 @@ def main(secrets):
                 raise RuntimeError("Another Compose initialization job holds the bootstrap lock")
             print("Preparing schema, accounts and GTID replica")
             configure_primary(primary, secrets)
+            key_dir = Path("/run/orderflow-ai")
+            key_dir.mkdir(parents=True, exist_ok=True)
+            key_file = key_dir / "master.key"
+            if not key_file.exists():
+                if value(primary, "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='orderflow' AND table_name='ai_runtime_config'"):
+                    if value(primary, "SELECT COUNT(*) FROM orderflow.ai_runtime_config WHERE chat_secret IS NOT NULL OR embedding_secret IS NOT NULL"):
+                        raise RuntimeError("Restore the AI master key volume before starting")
+                temporary = key_dir / (".master." + secure_random.token_hex(8))
+                fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                with os.fdopen(fd,"w") as output:
+                    output.write(secure_random.token_hex(32))
+                    output.flush()
+                    os.fsync(output.fileno())
+                os.chown(temporary,10001,10001)
+                temporary.replace(key_file)
             for migration in sorted((DATABASE / "migrations").glob("V*__*.sql")):
                 run_sql(primary, migration.relative_to(DATABASE))
                 print(f"Schema ready: {migration.name}")

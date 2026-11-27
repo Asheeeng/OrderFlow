@@ -6,17 +6,19 @@ import { actor, api, currency, displayTime, integer, roles, statuses, type Actor
 
 const Trend = defineAsyncComponent(() => import('./Trend.vue'))
 const AiPanel = defineAsyncComponent(() => import('./AiPanel.vue'))
+const AiConfigPanel = defineAsyncComponent(() => import('./AiConfigPanel.vue'))
 const aiModes = ['agent','rag','knowledge','inventory']
 const menus = {
   CUSTOMER: [['catalog','商品目录',Goods], ['cart','我的购物车',ShoppingCart], ['orders','我的订单',Tickets], ['rag','智能客服',Collection]],
   MERCHANT: [['overview','销售概览',DataAnalysis], ['products','商品与库存',Box], ['orders','订单处理',Van], ['inventory','AI 库存分析',DataAnalysis]],
   ADMIN: [['overview','平台概览',DataAnalysis], ['orders','订单管理',Tickets], ['products','商品管理',Box],
-    ['users','用户管理',User], ['merchants','商家管理',Goods], ['labs','数据库实验',Collection], ['system','运行状态',Odometer], ['agent','AI 数据助手',DataAnalysis], ['knowledge','客服知识库',Collection]],
+    ['users','用户管理',User], ['merchants','商家管理',Goods], ['labs','数据库实验',Collection], ['system','运行状态',Odometer], ['agent','AI 数据助手',DataAnalysis], ['knowledge','客服知识库',Collection], ['ai-config','AI 配置中心',Odometer]],
 } as const
 const menu = computed(() => actor.value ? menus[actor.value.role] : [])
 const view = ref('')
 const title = computed(() => menu.value.find(item => item[0] === view.value)?.[1] ?? '')
 const intro: Record<string,string> = {
+  'ai-config': '连接模型、管理知识库并核对调用用量。',
   agent: '用自然语言查询平台数据，核对 SQL 工具结果。',
   rag: '根据公共业务规则回答问题，并显示引用。',
   inventory: '按店铺实际销量和库存生成只读补货建议。',
@@ -314,6 +316,7 @@ const roleName = (role?: Role) => role ? roles[role] : ''
         <div class="page-title"><div><h1>{{ title }}</h1><p>{{ intro[view] }}</p></div>
           <el-button plain :icon="Refresh" :loading="loading" @click="load">刷新</el-button>
         </div>
+        <AiConfigPanel v-if="view==='ai-config'" />
         <AiPanel v-if="aiModes.includes(view)" :key="view" :mode="view" />
         <p v-if="error" class="notice error" role="alert">{{ error }}</p>
         <p v-if="notice" class="notice" role="status">{{ notice }}</p>

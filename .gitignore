@@ -44,3 +44,7 @@ redis-data/
 dump-*.sql
 
 !.env.docker.example
+
+# Offline export of the AI configuration key volume
+*.orderflow-ai-key.tar
+ai-master.key

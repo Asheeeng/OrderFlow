@@ -32,3 +32,7 @@ orderflow:
   evidence-dir: ${OF_EVIDENCE_DIR:../evidence}
 mybatis-plus:
   global-config.banner: false
+logging:
+  level:
+    org.apache.hc.client5.http.wire: "OFF"
+    org.apache.hc.client5.http.headers: "OFF"

@@ -72,6 +72,8 @@ class AiKnowledge {
             var vectors = new ArrayList<byte[]>();
             for (var segment : doc.segments()) {
                 double[] vector = provider.embed(actor, "RAG_INDEX", doc.title() + "\n" + segment.title() + "\n" + segment.body());
+                int expected = provider.embeddingDimension();
+                if(expected>0 && vector.length!=expected) throw unavailable("向量维度变化，请重新保存配置后重建");
                 dimension = sameDimension(dimension, vector.length);
                 var bytes = ByteBuffer.allocate(vector.length * Double.BYTES);
                 for (double n : normalized(vector)) bytes.putDouble(n);

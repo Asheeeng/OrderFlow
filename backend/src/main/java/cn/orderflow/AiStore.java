@@ -12,19 +12,10 @@ import org.springframework.stereotype.Component;
 class AiStore {
     final JdbcTemplate db;
     private final ObjectMapper json;
-    private final int dayLimit;
-    private final int minuteLimit;
+    private final AiConfig config;
 
-    AiStore(JdbcTemplate db, ObjectMapper json, Environment env) {
-        this.db = db;
-        this.json = json;
-        this.dayLimit = limit(env, "AI_DAILY_CALL_LIMIT", 300, 2000);
-        this.minuteLimit = limit(env, "AI_USER_MINUTE_LIMIT", 20, 120);
-    }
-
-    private int limit(Environment env, String name, int fallback, int max) {
-        try { return Math.max(1, Math.min(max, Integer.parseInt(env.getProperty(name, Integer.toString(fallback))))); }
-        catch (NumberFormatException invalid) { return fallback; }
+    AiStore(JdbcTemplate db, ObjectMapper json, AiConfig config) {
+        this.db=db; this.json=json; this.config=config;
     }
 
     long conversation(Actor actor, String mode, Long id) {
@@ -57,7 +48,7 @@ class AiStore {
         long minute = db.queryForObject("""
             SELECT COUNT(*) FROM ai_request_logs WHERE user_id=? AND created_at>=UTC_TIMESTAMP()-INTERVAL 60 SECOND
             """, Long.class, user);
-        if (day >= dayLimit || minute >= minuteLimit) {
+        if (day >= config.current().settings().dailyLimit() || minute >= config.current().settings().minuteLimit()) {
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "AI 调用额度已达到上限，稍后再试");
         }
         return Db.insert(db, "INSERT INTO ai_request_logs(user_id,operation,model,status) VALUES(?,?,?,'STARTED')",

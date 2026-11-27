@@ -135,3 +135,9 @@ td small { display:block; font-size:11px; color:var(--muted); margin-top:1px; }
 .ai-docs button { display:flex; flex-wrap:wrap; align-items:center; gap:12px; border:1px solid var(--line); text-align:left; padding:12px; background:white; border-radius:6px; cursor:pointer; }
 .ai-totals { display:grid; grid-template-columns:minmax(120px,1fr) 1fr; gap:4px 12px; }
 .ai-totals dd { margin:0; font-weight:650; }
+.config-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;}
+.config-grid label {display:grid;gap:5px;align-content:start;}
+.config-grid label:has(input[type=checkbox]) {display:flex;align-items:center;gap:8px;}
+.config-grid input:not([type=checkbox]),.config-grid select {width:100%;min-height:32px;border:1px solid #dcdfe6;border-radius:4px;padding:0 9px;}
+.config-wide {grid-column:1/-1;}
+@media(max-width:680px){.config-grid{grid-template-columns:1fr;}}
