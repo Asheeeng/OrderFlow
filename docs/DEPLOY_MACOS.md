@@ -25,3 +25,8 @@ scripts/stop.sh
 ```
 
 此方式需要 Java 17、Maven、Node.js、npm、Python、OpenSSL 和 Docker。恢复细节仍见 [实验手册](MYSQL_EXPERIMENTS.md)。原 `.env`、Navicat 密码及已有数据可沿用。需要与全 Docker 同时使用时，只在新 Docker 环境文件设备用端口。实际 ARM64 验收使用了独立项目，既有 V1.0 实例继续运行。
+
+
+### 代理软件与 Fake-IP 排查
+
+如果 AI 配置中心提示 DNS 返回代理 Fake-IP，请在代理软件的 DNS 设置中将 `dashscope.aliyuncs.com` 加入 Fake-IP 排除列表（业务空间使用其他域名时也需加入对应域名），应用配置后重新解析并重试。Clash/Mihomo 类配置可在 `dns.fake-ip-filter` 中添加该域名；具体操作以所用软件界面为准。macOS 和 Windows 均适用。Docker Desktop 使用自己的 DNS 转发，宿主机解析恢复后仍需检查后端容器内解析结果；必要时仅重建后端容器。不要将 198.18.0.0/15 加入安全白名单，也不要固定服务商 IP。

@@ -40,7 +40,12 @@ final class AiTransport {
     // Filter the exact DNS answers used for the socket. The TLS host remains the original DNS name.
     static InetAddress[] publicAddresses(String host) throws UnknownHostException {
         var addresses=InetAddress.getAllByName(host);
-        for(var address:addresses) if(!publicAddress(address)) throw new UnknownHostException("non-public DNS answer");
+        for(var address:addresses) {
+            byte[] bytes=address.getAddress();
+            if(bytes.length==4 && (bytes[0]&255)==198 && ((bytes[1]&255)==18 || (bytes[1]&255)==19))
+                throw new UnknownHostException("fake-ip DNS answer");
+            if(!publicAddress(address)) throw new UnknownHostException("non-public DNS answer");
+        }
         return addresses;
     }
 

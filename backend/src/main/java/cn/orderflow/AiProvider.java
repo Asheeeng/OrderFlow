@@ -121,7 +121,19 @@ class AiProvider implements AiModel {
                         throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE,"模型连接重试已中断");
                     }
                 }
-                throw new ApiException(HttpStatus.BAD_GATEWAY, "模型连接失败、地址受限或响应超限");
+                String message=error.getMessage();
+                for (Throwable cause=error; cause!=null; cause=cause.getCause()) {
+                    String detail=cause.getMessage();
+                    if(detail!=null && detail.contains("fake-ip DNS answer"))
+                        throw new ApiException(HttpStatus.BAD_GATEWAY,"DNS 返回代理 Fake-IP，请检查代理软件的 Fake-IP 排除规则及 DNS 配置");
+                    if(detail!=null && detail.contains("non-public DNS answer"))
+                        throw new ApiException(HttpStatus.BAD_GATEWAY,"SSRF 安全策略拒绝了非公网 DNS 地址");
+                    if(cause instanceof javax.net.ssl.SSLException)
+                        throw new ApiException(HttpStatus.BAD_GATEWAY,"TLS 证书验证或安全连接失败");
+                    if(cause instanceof java.net.UnknownHostException)
+                        throw new ApiException(HttpStatus.BAD_GATEWAY,"模型服务域名解析失败，请检查 DNS 配置");
+                }
+                throw new ApiException(HttpStatus.BAD_GATEWAY, message!=null && message.contains("body limit") ? "模型响应体超过大小限制" : "模型服务网络连接失败，请检查网络及代理配置");
             } catch (IllegalArgumentException error) {
                 throw invalidReply();
             } catch (InterruptedException error) {

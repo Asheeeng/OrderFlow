@@ -65,3 +65,8 @@ docker compose -p orderflow-docker -f compose.docker.yml --env-file .env.docker 
 ## V1.1 可选 AI 模块
 
 沿用相同项目、数据库与数据卷。主库初始化会执行增量 SQL 并等待复制，原业务数据继续复用。模型密钥通过既有环境文件仅注入运行中的后端，构建无需密钥。升级和模型设置见 [升级指南](UPGRADE_V1.1.md) 与 [模型配置](AI_CONFIG.md)。
+
+
+### 代理软件与 Fake-IP 排查
+
+如果 AI 配置中心提示 DNS 返回代理 Fake-IP，请在代理软件的 DNS 设置中将 `dashscope.aliyuncs.com` 加入 Fake-IP 排除列表（业务空间使用其他域名时也需加入对应域名），应用配置后重新解析并重试。Clash/Mihomo 类配置可在 `dns.fake-ip-filter` 中添加该域名；具体操作以所用软件界面为准。macOS 和 Windows 均适用。Docker Desktop 使用自己的 DNS 转发，宿主机解析恢复后仍需检查后端容器内解析结果；必要时仅重建后端容器。不要将 198.18.0.0/15 加入安全白名单，也不要固定服务商 IP。

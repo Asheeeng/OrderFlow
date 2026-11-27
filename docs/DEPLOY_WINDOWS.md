@@ -74,3 +74,8 @@ Windows 说明依据 Docker Desktop 与 Microsoft 的官方流程。实际测试
 ## 已部署 V1.0.1 的组员
 
 保留原 `.env.docker`、项目名及命名卷。获取候选代码后，在原项目目录重新运行 `.\start.ps1`。原自定义路径和端口按之前参数运行。升级与模型启用可以分开进行。[保留数据升级](UPGRADE_V1.1.md)
+
+
+### 代理软件与 Fake-IP 排查
+
+如果 AI 配置中心提示 DNS 返回代理 Fake-IP，请在代理软件的 DNS 设置中将 `dashscope.aliyuncs.com` 加入 Fake-IP 排除列表（业务空间使用其他域名时也需加入对应域名），应用配置后重新解析并重试。Clash/Mihomo 类配置可在 `dns.fake-ip-filter` 中添加该域名；具体操作以所用软件界面为准。macOS 和 Windows 均适用。Docker Desktop 使用自己的 DNS 转发，宿主机解析恢复后仍需检查后端容器内解析结果；必要时仅重建后端容器。不要将 198.18.0.0/15 加入安全白名单，也不要固定服务商 IP。
