@@ -1,6 +1,7 @@
 """Deterministic OpenAI-compatible HTTP fixture. No real model or provider is used."""
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import re
 import time
 from ai_cases import AGENT, RAG
 
@@ -27,6 +28,16 @@ def chat(data):
     messages = data["messages"]
     system = messages[0]["content"]
     user = next(message["content"] for message in reversed(messages) if message["role"]=="user")
+    if user == "Reply with ORDERFLOW_OK.":
+        return {"content":"ORDERFLOW_OK"}
+    if user.startswith("Call verify_echo"):
+        if messages[-1]["role"]=="tool":
+            return {"content":messages[-1]["content"]}
+        if data["model"]=="fixture-no-tool":
+            return {"content":"OK"}
+        nonce=re.search(r"nonce ([0-9a-f-]{36})",user).group(1)
+        return {"content":None,"tool_calls":[{"id":"probe_1","type":"function",
+                "function":{"name":"verify_echo","arguments":json.dumps({"nonce":nonce})}}]}
     if "公共客服 RAG" in system:
         payload = json.loads(user)
         source = payload["sources"][0]
@@ -59,11 +70,11 @@ def chat(data):
 class Fixture(BaseHTTPRequestHandler):
     def do_POST(self):
         request = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
-        if not self.headers.get("Authorization","").startswith("Bearer "):
+        if self.headers.get("Authorization","") not in ("Bearer local-fixture-only","Bearer fixture-alternate"):
             self.send_error(401)
             return
         if self.path == "/v1/embeddings":
-            payload = {"data":[{"embedding":vector(request["input"])}],"usage":{"prompt_tokens":3,"total_tokens":3}}
+            payload = {"data":[{"embedding":vector(request["input"])+([0] if request["model"]=="fixture-embedding-v2" else [])}],"usage":{"prompt_tokens":3,"total_tokens":3}}
         elif self.path == "/v1/chat/completions":
             if request["messages"][-1]["content"] == "模拟模型服务持续错误。":
                 self.send_error(503)

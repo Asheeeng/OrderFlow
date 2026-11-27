@@ -40,3 +40,7 @@ Mock 模型标识为 `fixture-chat` 和 `fixture-embedding`，向量维度 11。
 - [52 项 Mock 逐例结果](mock-evaluation.jsonl.txt) · [向量空间切换](vector-space.txt) · [Chrome](chrome.txt)
 - Mock 页面截图 [Agent](screenshots/mock-agent.png) · [客服](screenshots/mock-rag.png) · [库存](screenshots/mock-inventory.png)
 - [主从精确行数、真实 SQL 检查和资源用量](db-and-resources.txt) · [AMD64 Dockerfile 配置检查](amd64-build-check.txt)
+
+## 配置中心补充验收 2026-11-27
+
+可视化配置中心已完成隔离 Mock 验收，新增密钥安全、四项连接测试、配置热切换和重建持久化。[配置中心报告及截图](config-center/README.md)

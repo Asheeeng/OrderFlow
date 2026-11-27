@@ -1,0 +1,4 @@
+PASS: first admin save, one shared key, all three AI flows, independent tests, actual tool handshake and KB readiness
+PASS: wrong-key rollback, revision conflict, hot chat switch preserves vectors, separate embedding key and 11→12 dimension rebuild
+PASS: AES-GCM ciphertext in MySQL and masked GET, CSRF/role guards, SSRF URL denials
+PASS: key and config survive recreation; explicit clear keeps the other key and leaves business online

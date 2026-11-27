@@ -1,0 +1,10 @@
+init-1  | Schema ready: V120__ai_settings.sql
+init-1  | historical data already present orders=400000
+init-1  | READY: mode=million; primary schema, seed, GTID replica and demo accounts verified
+master file owner=10001 permissions=600
+port 5173 HTTP 200
+port 5273 HTTP 200
+port 5473 HTTP 200
+GTID wait: 0
+Replica configurations: 1
+Replica order details: 1000021

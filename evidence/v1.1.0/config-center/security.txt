@@ -1,0 +1,1 @@
+PASS: blocked special-use addresses, strict URI policy, random AES-GCM nonce, slot authentication, tamper rejection and request snapshot isolation

@@ -1,0 +1,11 @@
+# Apply after compose.ai-mock.yml on an isolated test project only.
+services:
+  backend:
+    environment:
+      AI_ENABLED: "false"
+      AI_BASE_URL: ""
+      AI_API_KEY: ""
+      AI_CHAT_MODEL: ""
+      AI_EMBEDDING_BASE_URL: ""
+      AI_EMBEDDING_API_KEY: ""
+      AI_EMBEDDING_MODEL: ""
