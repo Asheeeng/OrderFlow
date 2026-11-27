@@ -113,6 +113,14 @@ class AiProvider implements AiModel {
                 status = "TIMEOUT";
                 throw new ApiException(HttpStatus.GATEWAY_TIMEOUT, "模型服务响应超时");
             } catch (java.io.IOException error) {
+                status = "NETWORK_ERROR";
+                if (attempt == 0 && !(error.getMessage()!=null && error.getMessage().contains("body limit"))) {
+                    try { Thread.sleep(300); continue; }
+                    catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
+                        throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE,"模型连接重试已中断");
+                    }
+                }
                 throw new ApiException(HttpStatus.BAD_GATEWAY, "模型连接失败、地址受限或响应超限");
             } catch (IllegalArgumentException error) {
                 throw invalidReply();

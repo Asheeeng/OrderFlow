@@ -20,6 +20,8 @@ const current=ref<Config>()
 const state=ref<Settings>()
 const chatKey=ref('')
 const embeddingKey=ref('')
+const changingChat=ref(false)
+const changingEmbedding=ref(false)
 const probes=ref<Probe[]>([])
 const documents=ref<Row[]>([])
 const usage=ref<{summary:Row;functions:Row[];models:Row[];recent:Row[]}>()
@@ -29,7 +31,7 @@ const notice=ref('')
 const ready=()=>documents.value.length>0&&documents.value.every(row=>Boolean(row.compatible)&&Number(row.chunks)>0)
 
 function apply(next:Config){
-  current.value=next;state.value={...next.settings};chatKey.value=embeddingKey.value=''
+  current.value=next;state.value={...next.settings};chatKey.value=embeddingKey.value='';changingChat.value=changingEmbedding.value=false
   if(next.revision===0&&!state.value.chatUrl&&!state.value.embeddingUrl) pick('alibaba')
 }
 function pick(provider:string){
@@ -78,13 +80,17 @@ const keys=(rows:Row[])=>Object.keys(rows[0]??{})
       <label>Chat Model <input v-model="state.chatModel" list="chat-models" aria-label="Chat Model"/>
         <datalist id="chat-models"><option v-for="item in presets[state.provider].chat" :key="item" :value="item"/></datalist>
       </label>
-      <label>API Key <el-input v-model="chatKey" type="password" autocomplete="new-password" aria-label="API Key"
-        :placeholder="current.chatKeyConfigured?current.keyMask+' 留空保留':'填写 API Key'"/></label>
+      <div><p v-if="current.chatKeyConfigured">API Key 已配置，无需重新输入，留空将保留原密钥。</p>
+        <el-button v-if="current.chatKeyConfigured && !changingChat" @click="changingChat=true">更换 API Key</el-button>
+      <label v-if="!current.chatKeyConfigured || changingChat">API Key <el-input v-model="chatKey" type="password" autocomplete="new-password" aria-label="API Key"
+        :placeholder="current.chatKeyConfigured?current.keyMask+' 留空保留':'填写 API Key'"/></label></div>
       <label><input v-model="state.shared" type="checkbox"/> Embedding 共用接口和密钥</label>
       <template v-if="!state.shared">
         <label>Embedding Base URL <el-input v-model="state.embeddingUrl" aria-label="Embedding Base URL"/></label>
-        <label>Embedding API Key <el-input v-model="embeddingKey" type="password" autocomplete="new-password" aria-label="Embedding API Key"
-          :placeholder="current.embeddingKeyConfigured?current.keyMask+' 留空保留':'填写独立密钥'"/></label>
+        <div><p v-if="current.embeddingKeyConfigured">Embedding API Key 已配置，无需重新输入，留空将保留原密钥。</p>
+        <el-button v-if="current.embeddingKeyConfigured && !changingEmbedding" @click="changingEmbedding=true">更换 Embedding API Key</el-button>
+        <label v-if="!current.embeddingKeyConfigured || changingEmbedding">Embedding API Key <el-input v-model="embeddingKey" type="password" autocomplete="new-password" aria-label="Embedding API Key"
+          :placeholder="current.embeddingKeyConfigured?current.keyMask+' 留空保留':'填写独立密钥'"/></label></div>
       </template>
       <label>Embedding Model <input v-model="state.embeddingModel" list="embedding-models" aria-label="Embedding Model"/>
         <datalist id="embedding-models"><option v-for="item in presets[state.provider].embedding" :key="item" :value="item"/></datalist>

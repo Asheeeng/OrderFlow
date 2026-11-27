@@ -1,0 +1,124 @@
+{
+  "testedAtUtc": "2026-11-27T06:22:40.243985+00:00",
+  "endpoint": "http://127.0.0.1:5473/api",
+  "savedProvider": "alibaba",
+  "chatModel": "qwen4-max",
+  "embeddingModel": "qwen3.7-text-embedding-flash",
+  "credentialsConfigured": true,
+  "queries": [
+    {
+      "index": 1,
+      "question": "最近30天的销售额是多少？",
+      "actualToolArguments": [
+        {
+          "name": "query_sales",
+          "arguments": {
+            "start": "2026-10-29",
+            "endExclusive": "2026-11-28"
+          }
+        }
+      ],
+      "source": "model",
+      "answer": "最近 30 天（2026-10-29 至 2026-11-27，UTC）的销售情况如下：\n\n- **销售额：36,526,538.65 元**（约 3,652.65 万元）\n- **成功支付订单数：17,959 笔**\n\n说明：销售额按模拟成功支付时间统计，已排除取消订单。",
+      "tools": [
+        {
+          "name": "query_sales",
+          "arguments": {
+            "start": "2026-10-29",
+            "endExclusive": "2026-11-28"
+          },
+          "source": "MySQL GTID 从库只读",
+          "definition": "销售额按模拟成功支付时间统计，排除取消订单。UTC 起日包含，止日不包含，最多 92 天。",
+          "sqlTemplate": "SELECT COALESCE(SUM(pay.amount),0) sales, COUNT(*) paid_orders FROM payments pay JOIN orders o ON o.id=pay.order_id\nWHERE pay.status='SUCCESS' AND o.status<>'CANCELLED' AND pay.paid_at>=? AND pay.paid_at<?\n",
+          "elapsedMs": 311,
+          "rows": [
+            {
+              "sales": 36526538.65,
+              "paid_orders": 17959
+            }
+          ],
+          "chart": "",
+          "labelField": "",
+          "valueField": ""
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "question": "查看最近一个月订单状态分布，分别说清每种状态的订单量。",
+      "actualToolArguments": [
+        {
+          "name": "query_order_status",
+          "arguments": {
+            "start": "2026-10-29",
+            "endExclusive": "2026-11-28"
+          }
+        }
+      ],
+      "source": "model",
+      "answer": "最近一个月（2026-10-29 至 2026-11-27，UTC，按下单时间汇总当前订单状态）的订单状态分布如下：\n\n| 订单状态 | 订单量 |\n|---|---|\n| 待支付（PENDING） | 3,057 |\n| 已支付（PAID） | 2,823 |\n| 已发货（SHIPPED） | 3,077 |\n| 已完成（COMPLETED） | 12,021 |\n| 已取消（CANCELLED） | 2,877 |\n\n说明：\n- 统计口径为按下单时间落在该区间内的订单，反映其**当前**状态。\n- 各状态数量均为工具返回的精确值，未做合并或估算。",
+      "tools": [
+        {
+          "name": "query_order_status",
+          "arguments": {
+            "start": "2026-10-29",
+            "endExclusive": "2026-11-28"
+          },
+          "source": "MySQL GTID 从库只读",
+          "definition": "按下单时间汇总当前订单状态。UTC 起日包含，止日不包含，最多 92 天。",
+          "sqlTemplate": "SELECT status label,COUNT(*) orders FROM orders WHERE created_at>=? AND created_at<? GROUP BY status ORDER BY status",
+          "elapsedMs": 418,
+          "rows": [
+            {
+              "label": "PENDING",
+              "orders": 3057
+            },
+            {
+              "label": "PAID",
+              "orders": 2823
+            },
+            {
+              "label": "SHIPPED",
+              "orders": 3077
+            },
+            {
+              "label": "COMPLETED",
+              "orders": 12021
+            },
+            {
+              "label": "CANCELLED",
+              "orders": 2877
+            }
+          ],
+          "chart": "pie",
+          "labelField": "label",
+          "valueField": "orders"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "question": "找出最近30天销量最高的5种商品。",
+      "failureType": "AssertionError",
+      "failure": "POST /ai/chat: expected 200, got 503 {\"message\":\"数据库操作暂时无法完成\"}"
+    },
+    {
+      "index": 4,
+      "question": "最近30天畅销商品及库存情况如何？请标出畅销但库存偏低的商品。",
+      "failureType": "AssertionError",
+      "failure": "POST /ai/chat: expected 200, got 502 {\"message\":\"模型连接失败、地址受限或响应超限\"}"
+    },
+    {
+      "index": 5,
+      "question": "比较最近30天和前30天销售额的变化，并说明增减。",
+      "failureType": "TimeoutError",
+      "failure": "timed out"
+    },
+    {
+      "index": 6,
+      "question": "分析最近30天销售趋势，并结合畅销低库存工具结果给出运营建议。",
+      "failureType": "AssertionError",
+      "failure": "POST /ai/chat: expected 200, got 502 <html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body>\r\n<center><h1>502 Bad Gateway</h1></center>\r\n<hr><center>nginx/1.28.0</center>\r\n</body>\r\n</html>\r\n"
+    }
+  ]
+}

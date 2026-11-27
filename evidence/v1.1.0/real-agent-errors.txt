@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/suis/Developer/2026-2027Works/高级数据库/Final/OrderFlow/tests/real_agent_acceptance.py", line 63, in <module>
+    assert record["http"]=="PASS",record
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'index': 4, 'question': '最近30天畅销商品及库存情况如何？请标出畅销但库存偏低的商品。', 'http': 'FAIL', 'errorType': 'AssertionError', 'error': 'POST /ai/chat: expected 200, got 504 {"message":"模型服务响应超时"}'}

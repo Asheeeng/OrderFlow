@@ -30,7 +30,7 @@ class Client:
         request = Request(BASE + url, data=json.dumps(body).encode() if body is not None else None,
                           method=method, headers=headers)
         try:
-            response = self.opener.open(request, timeout=35)
+            response = self.opener.open(request, timeout=int(os.getenv("OF_HTTP_TIMEOUT", "35")))
         except HTTPError as error:
             response = error
         with response:

@@ -69,8 +69,8 @@ class AiTools {
         return Collections.unmodifiableMap(tools);
     }
 
-    List<Map<String,Object>> descriptions() {
-        return DEFINITIONS.entrySet().stream().map(entry -> {
+    List<Map<String,Object>> descriptions(boolean includeProductDetail) {
+        return DEFINITIONS.entrySet().stream().filter(entry->includeProductDetail || !entry.getKey().equals("query_product_stock")).map(entry -> {
             var def = entry.getValue();
             var properties = new LinkedHashMap<String,Object>();
             for (String key : def.keys()) {
@@ -121,7 +121,7 @@ class AiTools {
     private static long max(String key) {
         return switch (key) {
             case "threshold" -> 100000;
-            case "limit" -> 20;
+            case "limit" -> 10;
             default -> 2_000_000_000L;
         };
     }

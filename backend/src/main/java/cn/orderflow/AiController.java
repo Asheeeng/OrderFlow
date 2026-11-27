@@ -48,7 +48,14 @@ class AiController {
             if (admin) {
                 var result = agent.answer(actor,id,input,history);
                 store.remember(id,"assistant",result.answer());
-                return Map.of("conversationId",id,"answer",result.answer(),"tools",result.tools());
+                var response=new LinkedHashMap<String,Object>();
+                response.put("conversationId",id); response.put("answer",result.answer());
+                response.put("answerSource",result.answerSource()); response.put("tools",result.tools());
+                if(actor.role().equals("ADMIN") && result.modelDraft()!=null) {
+                    response.put("modelDraft",result.modelDraft());
+                    response.put("validationReason",result.validationReason());
+                }
+                return response;
             }
             var result = knowledge.answer(actor,input,history);
             store.remember(id,"assistant",result.answer());

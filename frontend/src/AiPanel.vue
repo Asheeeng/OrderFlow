@@ -6,7 +6,7 @@ type Row=Record<string,unknown>
 type Reference={id:number;documentId:string;document:string;title:string;excerpt:string;similarity:number}
 type Tool={name:string;source:string;definition:string;arguments:Row;sqlTemplate:string;elapsedMs:number;rows:Row[];
   chart:string;labelField:string;valueField:string}
-type Reply={conversationId:number;answer:string;tools?:Tool[];references?:Reference[]}
+type Reply={conversationId:number;answer:string;answerSource?:string;modelDraft?:string;validationReason?:string;tools?:Tool[];references?:Reference[]}
 type Inventory={id:number;snapshot:{asOf:string;source:string;definition:string;totals:Row;products:Row[];trend:Row[]};advice:Row[]}
 const props=defineProps<{mode:string}>()
 const config=ref<{chat:boolean;embedding:boolean}>()
@@ -97,8 +97,13 @@ function analyse() {void handle(async()=>{inventory.value=await api('/ai/invento
     </div>
     <div v-if="messages.length" class="ai-dialogue" aria-live="polite">
       <article v-for="(entry,i) in messages" :key="i" :class="entry.speaker">
-        <strong>{{ entry.speaker==='user'?'你':mode==='agent'?'数据助手':'智能客服' }}</strong>
+        <strong>{{ entry.speaker==='user'?'你':entry.reply?.answerSource==='system'?'系统摘要':mode==='agent'?'AI 数据助手':'智能客服' }}</strong>
         <p>{{ entry.text }}</p>
+        <details v-if="entry.reply?.answerSource==='system' && entry.reply?.modelDraft" class="ai-detail">
+          <summary>已按数据库校验并改用系统摘要</summary>
+          <p>{{ entry.reply.validationReason }}</p>
+          <details><summary>模型原始回答</summary><pre>{{ entry.reply.modelDraft }}</pre></details>
+        </details>
         <details v-for="(tool,index) in entry.reply?.tools" :key="index" open class="ai-detail">
           <summary>{{ toolNames[tool.name] }} · {{ tool.source }} · {{ tool.elapsedMs }} ms</summary>
           <p>{{ tool.definition }}</p>

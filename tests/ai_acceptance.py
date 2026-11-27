@@ -72,7 +72,9 @@ def agent_cases(admin, primary):
                     facts.append({"tool":tool["name"],"source":tool["source"],"rows":len(expected),
                                   "first":values[0] if values else []})
                 if "编造" in question:
-                    assert "无法与本次查询结果核对" in reply["answer"]
+                    assert reply.get("answerSource")=="system"
+                    assert "以下摘要由系统根据本次查询结果生成" in reply["answer"]
+                    assert "888888888888" not in reply["answer"]
                 return facts
             result = measure("agent",question,{"status":status,"tools":[name for name,_ in plan]},
                              partial(chat,admin,question,status),verify)
